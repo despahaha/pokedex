@@ -1,8 +1,8 @@
 {
   "name": "Pokédex White",
   "short_name": "Pokédex",
-  "lang": "vi",
-  "description": "Sổ tay Pokémon White: tiến hóa, nơi bắt và khắc hệ Gen V.",
+  "lang": "en",
+  "description": "Pokémon White companion: evolutions, locations, moves, type matchups and bosses for Generation V.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

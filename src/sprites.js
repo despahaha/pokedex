@@ -15,7 +15,15 @@ const SHAPES = {
 13:`................|....#......#....|.....#....#.....|..##.######.##..|.#BB#AAAAAA#BB#.|#BBB#AKAAKA#BBB#|#BBB#AAAAAA#BBB#|#BBBB#AAAA#BBBB#|.#BBB#AAAA#BBB#.|..#BB#AAAA#BB#..|.#BBB#AAAA#BBB#.|.#BB#.#AA#.#BB#.|..##..#AA#..##..|.......##.......|................|................`,
 14:`................|................|....########....|..##AAAAAAAA##..|.#AAAAAAAAAAAA#.|.#BBBBBBBBBBBB#.|#AAAAAAAAAAAAAA#|#AKAAAAAAAAAAKA#|#AKAAAAAAAAAAKA#|#BBBBBBBBBBBBBB#|#AAAAAAAAAAAAAA#|.#AAAAAAAAAAAA#.|.#B#B#B##B#B#B#.|.#B#B#B##B#B#B#.|..#.#.#..#.#.#..|................`
 };
-for (const k in SHAPES) SHAPES[k] = SHAPES[k].split('|').map(r => (r + '................').slice(0, 16).split(''));
+/* Second drawing for the most common body shapes, so families that share a shape do not all look alike. */
+const SHAPES_ALT = {
+6:`................|..##......##....|.#AA#....#AA#...|.#AAA####AAA#...|.#AAAAAAAAAA#...|.#AKAAAAAAKA#...|.#AKAAAAAAKA#...|.#AAAAWWAAAA#...|..#AAAAAAAA#..#.|.#BAAWWWWAAB##B#|.#BAWWWWWWAB#BB#|..#AWWWWWWAAAB#.|..#AAWWWWAA###..|..#AAA##AAA#....|..####..####....|................`,
+8:`................|.##.............|#AA#............|#AAA#...........|#AKA#...........|#AAA#.........#.|.#AA#########B#.|.#AAAAAAAAAAAB#.|.#AAAAAAAAAAAA#.|..#AAAAAAAAAAA#.|..#AAAAAAAAAAA#.|..#A#A#...#A#A#.|..#A#A#...#A#A#.|..#B#B#...#B#B#.|..#####...#####.|................`,
+9:`................|................|#.....####.....#|##...#AAAA#...##|#B#.#AKAAKA#.#B#|#BB##AAAAAA##BB#|#BBB#AAAAAA#BBB#|#BBBBAAWWAABBBB#|.#BBBAWWWWABBB#.|..#BB#AWWA#BB#..|...###AAAA###...|.....#AAAA#.....|.....#B##B#.....|.....##..##.....|................|................`,
+12:`......####......|.....#AAAA#.....|....#AAAAAA#....|....#AKAAKA#....|....#AAAAAA#....|.....#AAAA#.....|...###BBBB###...|..#AA#BBBB#AA#..|..#A##BBBB##A#..|..##.#BBBB#.##..|....#BBBBBB#....|...#BBBBBBBB#...|..#BBBBBBBBBB#..|..#BBBBBBBBBB#..|...##AA##AA##...|.....##..##.....`,
+14:`................|................|................|.....######.....|...##BBBBBB##...|..#BBBBBBBBBB#..|.#BBB#BBBB#BBB#.|.#BBBBBBBBBBBB##|##############A#|#AAAAAAAAAAAAKA#|#AAAAAAAAAAAAAA#|.#A#AA####AA#A#.|.#A#AA#..#AA#A#.|.###BB#..#BB###.|...####..####...|................`
+};
+for (const S of [SHAPES, SHAPES_ALT]) for (const k in S) S[k] = S[k].split('|').map(r => (r + '................').slice(0, 16).split(''));
 /* Small head ornaments chosen by primary type, drawn above the head in the type's colour. */
 const ORN = {
   ears: ['X...X', 'XX.XX'], horn: ['..X..', '..X..', '.XXX.'], horns: ['X...X', 'X...X', '.X.X.'], tuft: ['.X.X.', '..X..'],
@@ -28,7 +36,7 @@ const mix = (hex, to, a) => '#' + [1, 3, 5].map(i => Math.round(parseInt(hex.sli
 const spriteCache = new Map();
 function sprite(m) {
   if (spriteCache.has(m.i)) return spriteCache.get(m.i);
-  let g = SHAPES[m.h].map(r => r.slice());
+  let g = ((m.c >> 1) % 2 && SHAPES_ALT[m.h] || SHAPES[m.h]).map(r => r.slice());
   const hasKids = kids.has(m.i);
   /* 0 = first stage (drawn smaller), 1 = middle, 2 = final, 3 = does not evolve */
   const stage = !m.f && hasKids ? 0 : m.f && hasKids ? 1 : m.f ? 2 : 3;

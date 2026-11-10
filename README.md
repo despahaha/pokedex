@@ -1,6 +1,6 @@
 # Pokédex White
 
-Sổ tay cá nhân cho Pokémon White: tiến hóa, nơi bắt, khắc hệ Gen V và quản lý đội.
+Sổ tay cá nhân cho Pokémon White (giao diện tiếng Anh): tiến hóa, nơi bắt, chiêu thức, khắc hệ Gen V, đội hình trùm, quản lý đội và theo dõi Pokémon đã bắt.
 Ứng dụng web cài được (PWA), chạy offline sau lần mở đầu tiên.
 
 **Mở ứng dụng:** https://despahaha.github.io/pokedex/
@@ -33,5 +33,6 @@ Sửa giao diện trong `src/page.html`, không sửa trực tiếp `index.html`
 ## Ghi chú
 
 - Dữ liệu từ [PokeAPI](https://pokeapi.co), áp dụng luật Gen V (chưa có hệ Fairy).
-- Nơi bắt chưa gồm White Forest và các đợt bầy đàn (swarm).
+- Đội hình trùm và danh sách White Forest lấy từ [Pokémon Database](https://pokemondb.net).
+- Nơi bắt chưa gồm các đợt bầy đàn (swarm) và Dream World.
 - Hình minh họa là hình tự vẽ theo dáng, màu và hệ, không phải hình gốc của game.

@@ -1,11 +1,12 @@
 # Pokédex White
 
-Sổ tay cá nhân cho người đang chơi **Pokémon White (Gen V)**: tiến hóa, nơi bắt, khắc hệ, quản lý đội.
+Sổ tay cá nhân cho người đang chơi **Pokémon White (Gen V)**: tiến hóa, nơi bắt, chiêu thức, khắc hệ, trùm Gym, quản lý đội.
 Là một PWA tĩnh, chạy trên GitHub Pages: https://despahaha.github.io/pokedex/
 
 ## Người dùng
 
-- Chủ repo dùng ứng dụng trên iPhone và đang tập dùng Claude Code. Trả lời bằng **tiếng Việt**, giải thích bằng lời thường, tránh thuật ngữ khi không cần.
+- Chủ repo dùng ứng dụng trên iPhone và đang tập dùng Claude Code. **Trò chuyện bằng tiếng Việt**, giải thích bằng lời thường, tránh thuật ngữ khi không cần.
+- **Giao diện ứng dụng hoàn toàn bằng tiếng Anh** (chủ repo yêu cầu, để khớp với game). Mọi chữ mới thêm vào ứng dụng phải là tiếng Anh.
 - Ứng dụng phải dùng được **không cần Developer Mode** trên iPhone. Đây là lý do dự án tồn tại, đừng đề xuất hướng nào cần bật nó.
 
 ## Cấu trúc
@@ -36,7 +37,8 @@ Sau khi dựng, luôn kiểm tra trước khi đẩy lên:
 1. Chạy máy chủ tĩnh ở thư mục gốc (`python3 -m http.server`) và mở bằng Playwright ở khung iPhone (390×844), cả giao diện sáng lẫn tối.
 2. Không có lỗi JS trong console; `document.documentElement.scrollWidth - innerWidth` phải bằng 0 (không cuộn ngang).
 3. Service worker ở trạng thái `activated`; ngắt mạng, tải lại, danh sách vẫn hiện.
-4. Mở thử vài Pokémon có trường hợp đặc biệt: Eevee (nhiều nhánh), Snivy (được tặng), Whimsicott (chỉ có ở Black), Mewtwo (không có trong White).
+4. Mở thử vài Pokémon có trường hợp đặc biệt: Eevee (nhiều nhánh), Snivy (được tặng), Whimsicott (chỉ có ở Black), Mewtwo (không có trong White), Ralts (White Forest).
+5. Đi qua cả năm tab (Dex, Types, Places, Bosses, Team) và trang Options; thử cỡ chữ Largest xem có tràn ngang không.
 
 ## Xuất bản
 
@@ -48,22 +50,32 @@ GitHub Pages phục vụ nhánh `main`, thư mục gốc. Đẩy lên `main` là
 ## Quyết định đã chốt
 
 - **Luật Gen V, không phải bản mới nhất.** Chưa có hệ Fairy (17 hệ); Steel kháng Ghost và Dark; chỉ số gốc và hệ lấy theo Gen V. `build.py` áp các bảng `*_past` của PokeAPI để làm việc này. Khi thêm dữ liệu mới, luôn kiểm tra nó có khác giữa các thế hệ không.
+- **Chiêu thức theo Black/White.** Sức mạnh, độ chính xác, PP và hệ của chiêu lấy theo Gen V qua `move_changelog` (ví dụ Flamethrower 95, Tackle 50, Charm hệ Normal). Tên chiêu dùng tên tiếng Anh hiện tại.
 - **Tiến hóa theo Black/White.** Ví dụ Magneton tiến hóa ở Chargestone Cave, Feebas bằng trao đổi kèm Prism Scale, độ thân thiết cần 220.
 - **Không dùng hình gốc của game.** Sprite chính thức thuộc bản quyền Nintendo/Game Freak. Hình trong ứng dụng là linh vật tự vẽ theo dáng cơ thể, màu và hệ (`sprites.js`); trang chi tiết có nút mở hình gốc trên pokemondb.net. Đừng nhúng hay sao chép sprite chính thức, kể cả từ nguồn "miễn phí".
-- **Phong cách pixel.** Font Press Start 2P chỉ dùng cho chữ không dấu (số, nhãn hệ, tiêu đề tiếng Anh) vì nó không có dấu tiếng Việt; chữ tiếng Việt dùng VT323. Viền cứng, đổ bóng lệch, không bo góc.
-- **Tên Pokémon, hệ, vật phẩm, địa điểm giữ tiếng Anh** cho khớp chữ trong game; phần còn lại tiếng Việt.
+- **Phong cách pixel.** Press Start 2P cho số, nhãn hệ và tiêu đề ngắn; VT323 cho chữ đọc. Viền cứng, đổ bóng lệch, không bo góc.
+- **Không chép lời mô tả Pokédex của game** (flavor text): đó là văn bản có bản quyền. Trang chi tiết chỉ hiện số liệu: loài, chiều cao, cân nặng, năng lực, tỉ lệ bắt, nhóm trứng…
+- **Dữ liệu ngoài PokeAPI** (đội hình trùm, danh sách White Forest) lấy từ pokemondb.net và ghi trực tiếp trong `build.py`. Bulbapedia không truy cập được từ phiên đám mây.
 - **Một file, không framework, không phụ thuộc mạng lúc chạy.** Dữ liệu nằm sẵn trong `index.html`; font tự lưu trữ.
-- "Đội của tôi" lưu bằng `localStorage` trên máy người dùng, không có máy chủ.
+- Đội, danh sách đã bắt và cỡ chữ lưu bằng `localStorage` trên máy người dùng, không có máy chủ. Trang Options có mã sao lưu (`PDX1.…`) để chép tay sang máy khác.
 
 ## Hạn chế đã biết
 
-- Nơi bắt chưa gồm **White Forest** và các đợt **swarm** (PokeAPI không có), nên một số Pokémon bị ghi là không bắt được trong cốt truyện.
+- Nơi bắt chưa gồm các đợt **swarm** và Dream World (chưa có nguồn dữ liệu), nên một số Pokémon vẫn bị ghi là không bắt được. White Forest đã có nhưng chỉ ở mức danh sách loài, không có tỉ lệ.
+- Chưa có chiêu học qua trứng (egg moves) và Move Tutor.
 - Hình minh họa không phải chân dung từng con; các con cùng dáng, màu, hệ và giai đoạn trông gần giống nhau.
 - Dạng thay thế (Rotom, Deoxys, Basculin sọc đỏ/xanh…) chưa được tách riêng.
 
 ## Kế hoạch
 
-1. ~~Đưa mã nguồn vào repo, rút gọn địa chỉ~~ (xong). Còn lại: chủ repo thử trên iPhone thật.
-2. Hữu ích hơn khi chơi: **chiêu thức** (học ở cấp nào, TM/HM), **tra theo địa điểm**, đội hình Gym và Tứ Đại Thiên Vương, bổ sung White Forest và swarm, đánh dấu "đã bắt".
-3. Giao diện: thêm dáng hình cho các nhóm còn giống nhau, tìm kiếm theo hệ hoặc cấp, sao lưu và khôi phục đội, tùy chọn cỡ chữ.
-4. Mở rộng sang Black 2 / White 2 hoặc thế hệ khác, chỉ khi chủ repo cần.
+Đã xong:
+1. Mã nguồn trong repo, địa chỉ ngắn, PWA chạy offline.
+2. Giao diện tiếng Anh; số liệu Pokédex; chiêu thức theo cấp và TM/HM; tra theo địa điểm (tab Places); đội hình trùm (tab Bosses); White Forest; đánh dấu đã bắt.
+3. Tìm theo hệ, năng lực, cấp tiến hóa; sao lưu và khôi phục; tùy chọn cỡ chữ; thêm dáng hình thứ hai cho 5 nhóm cơ thể phổ biến.
+
+Còn lại, theo thứ tự ưu tiên:
+1. Chủ repo thử trên iPhone thật và báo chỗ bất tiện.
+2. Swarm, egg moves, Move Tutor (cần tìm nguồn dữ liệu truy cập được).
+3. Dạng thay thế (Rotom, Deoxys, Basculin…).
+4. Tra ngược theo chiêu: chọn một TM để xem con nào học được.
+5. Mở rộng sang Black 2 / White 2, chỉ khi chủ repo cần.

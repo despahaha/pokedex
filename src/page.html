@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
-/* Layout: one handheld column. Red device bar on top, three thumb tabs fixed at the bottom,
+/* Layout: one handheld column. Red device bar on top, five thumb tabs fixed at the bottom,
    content as "windows" with an ink title bar, hard pixel borders and offset shadows. */
 :root {
   --bg: #dfe5ea;
@@ -45,7 +45,7 @@ body {
   -webkit-font-smoothing: none; -webkit-text-size-adjust: 100%;
 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: var(--safe-t); z-index: 10; background: var(--red); }
-button, input { font: inherit; color: inherit; border-radius: 0; }
+button, input, textarea { font: inherit; color: inherit; border-radius: 0; }
 button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid var(--hi); outline-offset: 2px; }
 .wrap { max-width: 560px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
@@ -57,29 +57,31 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .top h1 { font-family: var(--px); font-size: 14px; margin: 0; letter-spacing: 1px; }
 .dots { display: flex; gap: 5px; margin-left: 4px; }
 .dots i { width: 8px; height: 8px; border: 2px solid #1a2030; }
-.top .ver { margin-left: auto; font-family: var(--px); font-size: 8px; opacity: .9; }
+.topbtn { margin-left: auto; background: rgba(0,0,0,.25); color: var(--red-ink); border: 3px solid #1a2030; padding: 2px 10px; font-size: 20px; min-height: 34px; }
+.topbtn[aria-pressed="true"] { background: var(--red-ink); color: #1a2030; }
 
 /* bottom tabs */
 .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9; background: var(--panel); border-top: 4px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.tabs .wrap { display: flex; gap: 8px; padding-block: 6px; }
-.tabs button { flex: 1; min-height: 46px; background: var(--panel-2); border: 3px solid var(--ink); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 21px; padding: 2px; }
-.tabs button b { font-weight: normal; font-family: var(--px); font-size: 11px; }
+.tabs .wrap { display: flex; gap: 5px; padding-block: 6px; }
+.tabs button { flex: 1 1 0; min-width: 0; min-height: 46px; background: var(--panel-2); border: 3px solid var(--ink); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 20px; padding: 2px 0; }
 .tabs button[aria-selected="true"] { background: var(--red); color: var(--red-ink); box-shadow: inset 0 -5px 0 rgba(0,0,0,.25); }
-.tabs .n { font-family: var(--px); font-size: 8px; background: var(--hi); color: #14181f; border: 2px solid #1a2030; padding: 3px 4px 2px; }
+.tabs .n { font-family: var(--px); font-size: 7px; background: var(--hi); color: #14181f; border: 2px solid #1a2030; padding: 3px 3px 2px; }
 
 main { padding-block: 12px calc(96px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; }
 .box { background: var(--panel); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); padding: 10px; scroll-margin-top: calc(var(--safe-t) + var(--bar-h) + 62px); }
 .box > h2 { background: var(--title); color: var(--title-ink); margin: -10px -10px 10px; padding: 5px 10px 6px; font-family: var(--tx); font-weight: normal; font-size: 23px; line-height: 1.05; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
 .box > h2 .ico { font-family: var(--px); font-size: 10px; color: var(--hi); }
+.box > h2 .end { margin-left: auto; display: flex; gap: 4px; }
 .note { color: var(--mute); font-size: 18px; margin: 0 0 10px; }
 .note:last-child { margin-bottom: 0; }
+.group { font-family: var(--px); font-size: 10px; margin: 6px 0 -4px; color: var(--mute); text-transform: uppercase; }
 
 /* list tools */
 .tools { position: sticky; top: calc(var(--safe-t) + var(--bar-h)); z-index: 5; background: var(--bg); margin: -12px 0 -4px; padding: 12px 0 8px; display: flex; flex-direction: column; gap: 8px; }
 .search { width: 100%; min-width: 0; background: var(--panel); border: 3px solid var(--ink); padding: 8px 10px; font-size: 22px; box-shadow: 4px 4px 0 var(--ink); -webkit-appearance: none; appearance: none; }
 .search::placeholder { color: var(--mute); }
 .seg { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.chip { background: var(--panel); border: 3px solid var(--ink); padding: 4px 9px; font-size: 20px; min-height: 36px; white-space: nowrap; }
+.chip { background: var(--panel); border: 3px solid var(--ink); padding: 4px 8px; font-size: 20px; min-height: 36px; white-space: nowrap; }
 .chip[aria-pressed="true"], .chip[aria-expanded="true"] { background: var(--ink); color: var(--panel); }
 .chip.push { margin-left: auto; }
 .typebar { display: flex; flex-wrap: wrap; gap: 7px; background: var(--panel); border: 3px solid var(--ink); padding: 10px; }
@@ -101,25 +103,28 @@ button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(
 .row .ev b { font-weight: normal; background: var(--hi); color: #14181f; padding: 1px 5px; border: 2px solid #1a2030; display: inline-block; }
 .row .ev i { font-style: normal; color: var(--mute); }
 .star { color: var(--bad); }
+.got { color: var(--good); }
 .empty { text-align: center; color: var(--mute); padding: 20px 0; }
+.prow { grid-template-columns: minmax(0, 1fr) auto; padding: 9px 10px; font-size: 23px; }
+.prow span:last-child { color: var(--mute); font-size: 19px; }
 
 /* detail */
 .dnav { display: flex; gap: 8px; align-items: stretch; }
 .btn { background: var(--panel); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 5px 10px; font-size: 20px; min-height: 40px; text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 .btn[disabled] { opacity: .4; }
+.btn[aria-pressed="true"] { background: var(--hi); color: #14181f; }
 .dnav .grow { margin-right: auto; }
-.dnav .btn { min-width: 0; }
-.dnav .step { flex: 0 1 auto; overflow: hidden; white-space: nowrap; }
+.flat { box-shadow: none; background: var(--panel-2); }
+.wide { width: 100%; margin-top: 10px; }
 .hero { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 12px; align-items: center; }
 .hero .tile { width: 86px; height: 86px; grid-row: auto; }
 .hero .no { font-family: var(--px); font-size: 8px; color: var(--mute); line-height: 1.7; }
-.hero h2 { font-family: var(--tx); font-size: 38px; font-weight: normal; margin: 0 0 4px; line-height: .95; overflow-wrap: anywhere; }
+.hero h2 { font-family: var(--tx); font-size: 38px; font-weight: normal; margin: 0; line-height: .95; overflow-wrap: anywhere; }
+.hero .ge { color: var(--mute); font-size: 19px; margin-bottom: 5px; }
 .hero .tys { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.hero .vi { color: var(--mute); font-size: 18px; }
-.acts { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
-.acts .btn { flex: 1 1 150px; box-shadow: none; background: var(--panel-2); }
-.acts .btn[aria-pressed="true"] { background: var(--hi); color: #14181f; }
+.acts { grid-column: 1 / -1; display: flex; gap: 8px; }
+.acts .btn { flex: 1 1 0; min-width: 0; padding-inline: 4px; }
 
 .jump { position: sticky; top: calc(var(--safe-t) + var(--bar-h)); z-index: 5; background: var(--bg); margin: -6px 0; padding: 6px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .jump::-webkit-scrollbar { display: none; }
@@ -132,21 +137,28 @@ button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(
 .edge { border-top: 2px dashed var(--mute); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
 .edge:first-child { border-top: 0; padding-top: 0; }
 .edge .pair { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.mon { background: var(--panel-2); border: 2px solid var(--ink); padding: 2px 8px 2px 2px; font-size: 21px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; }
-.mon img { width: 30px; height: 30px; image-rendering: pixelated; image-rendering: crisp-edges; background: #e9eef2; }
+.mon { background: var(--panel-2); border: 2px solid var(--ink); padding: 2px 8px 2px 2px; font-size: 21px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; text-align: left; }
+.mon img { width: 30px; height: 30px; flex: none; image-rendering: pixelated; image-rendering: crisp-edges; background: #e9eef2; }
 .mon.me { background: var(--ink); color: var(--panel); }
 .edge .how { color: var(--mute); font-size: 19px; }
 
 .locs { display: flex; flex-direction: column; }
-.loc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 0; border-top: 2px dashed var(--mute); }
+.loc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 0; border-top: 2px dashed var(--mute); align-items: center; }
 .loc:first-child { border-top: 0; padding-top: 0; }
-.loc .pl { font-size: 22px; grid-column: 1 / -1; }
+.loc .pl { font-size: 22px; grid-column: 1 / -1; background: none; border: 0; padding: 0; text-align: left; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.loc .pl.plain { text-decoration: none; }
 .loc .how { color: var(--mute); font-size: 19px; }
 .loc .rt { text-align: right; font-size: 19px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .loc .rt b { font-weight: normal; background: var(--panel-2); border: 2px solid var(--ink); padding: 0 5px; }
-.more { margin-top: 10px; width: 100%; box-shadow: none; background: var(--panel-2); }
 .warn { background: var(--panel-2); border: 3px solid var(--ink); padding: 8px; margin: 0 0 10px; }
 .warn:last-child { margin-bottom: 0; }
+
+.mv { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; gap: 1px 8px; padding: 6px 0; border-top: 2px dashed var(--mute); align-items: center; }
+.mv:first-child { border-top: 0; padding-top: 0; }
+.mv .lv { font-family: var(--px); font-size: 8px; color: var(--mute); }
+.mv .mn { font-size: 22px; overflow-wrap: anywhere; }
+.mv .ms { grid-column: 2 / -1; color: var(--mute); font-size: 18px; }
+.mv .ms b { font-weight: normal; color: var(--good); }
 
 .eff { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 8px 10px; align-items: start; }
 .mult { font-family: var(--px); font-size: 10px; text-align: center; padding: 6px 0 5px; border: 2px solid #1a2030; color: var(--on-mark); }
@@ -157,15 +169,33 @@ button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(
 .sub { margin: 12px 0 8px; display: flex; align-items: center; gap: 8px; font-size: 20px; }
 .sub:first-of-type { margin-top: 0; }
 
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; }
+.facts dt { color: var(--mute); }
+.facts dd { margin: 0; }
+.facts small { color: var(--mute); font-size: 18px; }
 .stats { display: grid; grid-template-columns: auto 34px minmax(0, 1fr); gap: 5px 8px; align-items: center; font-variant-numeric: tabular-nums; }
 .stats .bar { height: 12px; background: var(--panel-2); border: 2px solid var(--ink); }
 .stats .bar i { display: block; height: 100%; background: var(--good); }
 .stats .v { text-align: right; }
 
-/* team */
+/* team, bosses */
 .cover { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 7px 10px; align-items: center; }
 .cover .who { font-size: 19px; }
 .cover .who.no { color: var(--mute); }
+.squad { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.squad .m { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.squad .m .r { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.squad .m .l { font-family: var(--px); font-size: 8px; }
+.tips { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.tips .t { display: inline-flex; align-items: center; gap: 4px; font-size: 19px; }
+
+/* options */
+.sizes { display: flex; gap: 6px; }
+.sizes .btn { flex: 1 1 0; min-width: 0; padding-inline: 2px; }
+.code { width: 100%; min-height: 78px; background: var(--panel-2); border: 3px solid var(--ink); padding: 6px; font-size: 18px; resize: vertical; overflow-wrap: anywhere; }
+.meter { height: 16px; background: var(--panel-2); border: 2px solid var(--ink); margin: 4px 0 10px; }
+.meter i { display: block; height: 100%; background: var(--good); }
+.status { min-height: 22px; margin: 8px 0 0; }
 
 .picker { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
 .scroll { overflow-x: auto; }
@@ -185,65 +215,72 @@ table.mx { border-collapse: collapse; font-family: var(--px); font-size: 7px; }
   <div class="wrap">
     <div class="lens"></div><h1>POKéDEX</h1>
     <div class="dots"><i style="background:#e9483a"></i><i style="background:#ffd84a"></i><i style="background:#4bc56d"></i></div>
-    <span class="ver">WHITE · GEN V</span>
+    <button class="topbtn" id="open-more" aria-pressed="false">Options</button>
   </div>
 </header>
 
 <div class="wrap">
   <main id="view-list">
     <div class="tools">
-      <input class="search" id="q" type="search" placeholder="Tìm tên hoặc số…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Tìm Pokémon theo tên hoặc số">
+      <input class="search" id="q" type="search" placeholder="Name, number, type, “lv 17”…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search Pokémon by name, number, type, ability or evolution level">
       <div class="seg">
         <button class="chip" id="dex-unova" aria-pressed="true">Unova</button>
-        <button class="chip" id="dex-nat" aria-pressed="false">Tất cả 649</button>
-        <button class="chip push" id="type-toggle" aria-expanded="false" aria-controls="typebar">Lọc hệ ▾</button>
+        <button class="chip" id="dex-nat" aria-pressed="false">All 649</button>
+        <button class="chip" id="only-new" aria-pressed="false">Uncaught</button>
+        <button class="chip push" id="type-toggle" aria-expanded="false" aria-controls="typebar">Type ▾</button>
       </div>
     </div>
-    <div class="typebar" id="typebar" aria-label="Lọc theo hệ" hidden></div>
+    <div class="typebar" id="typebar" aria-label="Filter by type" hidden></div>
     <div class="count" id="count"></div>
     <ul class="list" id="list"></ul>
   </main>
   <main id="view-detail" hidden></main>
+  <main id="view-places" hidden></main>
+  <main id="view-place" hidden></main>
+  <main id="view-bosses" hidden></main>
   <main id="view-team" hidden></main>
+  <main id="view-more" hidden></main>
   <main id="view-types" hidden>
     <section class="box">
-      <h2><span class="ico">▶</span>Tôi đánh bằng chiêu hệ…</h2>
-      <p class="note">Chọn hệ của chiêu thức để xem đánh hệ nào hiệu quả.</p>
+      <h2><span class="ico">▶</span>My move is type…</h2>
+      <p class="note">Pick a move's type to see what it hits hard.</p>
       <div class="picker" id="atk-pick"></div>
       <div class="eff" id="atk-out"></div>
     </section>
     <section class="box">
-      <h2><span class="ico">▶</span>Đối thủ thuộc hệ…</h2>
-      <p class="note">Chọn 1 hoặc 2 hệ của đối thủ để xem nên dùng chiêu hệ nào.</p>
+      <h2><span class="ico">▶</span>The opponent is type…</h2>
+      <p class="note">Pick the opponent's one or two types to see which moves to use.</p>
       <div class="picker" id="def-pick"></div>
       <div class="eff" id="def-out"></div>
     </section>
     <section class="box">
-      <h2><span class="ico">▶</span>Bảng khắc hệ Gen V</h2>
-      <p class="note">Hàng = hệ tấn công, cột = hệ phòng thủ. 2 = gấp đôi, ½ = giảm nửa, 0 = vô hiệu.</p>
+      <h2><span class="ico">▶</span>Gen V type chart</h2>
+      <p class="note">Rows attack, columns defend. 2 = double, ½ = half, 0 = no effect.</p>
       <div class="scroll"><table class="mx" id="mx"></table></div>
     </section>
   </main>
 </div>
 
-<nav class="tabs" aria-label="Chuyển mục">
+<nav class="tabs" aria-label="Sections">
   <div class="wrap" role="tablist">
-    <button id="tab-dex" role="tab" aria-selected="true"><b>◉</b>Pokémon</button>
-    <button id="tab-types" role="tab" aria-selected="false"><b>✚</b>Khắc hệ</button>
-    <button id="tab-team" role="tab" aria-selected="false"><b>★</b>Đội<span class="n" id="team-n">0</span></button>
+    <button id="tab-dex" role="tab" aria-selected="true">Dex</button>
+    <button id="tab-types" role="tab" aria-selected="false">Types</button>
+    <button id="tab-places" role="tab" aria-selected="false">Places</button>
+    <button id="tab-bosses" role="tab" aria-selected="false">Bosses</button>
+    <button id="tab-team" role="tab" aria-selected="false">Team<span class="n" id="team-n">0</span></button>
   </div>
 </nav>
 
 <script>
 const DATA = /*DATA*/;
-const T = DATA.types, C = DATA.chart, M = DATA.mons, LOCS = DATA.locs;
-const VI = ['Thường','Giác đấu','Bay','Độc','Đất','Đá','Bọ','Ma','Thép','Lửa','Nước','Cỏ','Điện','Siêu linh','Băng','Rồng','Bóng tối'];
+const T = DATA.types, C = DATA.chart, M = DATA.mons, LOCS = DATA.locs, MOVES = DATA.moves, TMS = DATA.tms;
 const COL = ['#a8a878','#c03028','#a890f0','#a040a0','#e0c068','#b8a038','#a8b820','#705898','#b8b8d0','#f08030','#6890f0','#78c850','#f8d030','#f85888','#98d8d8','#7038f8','#705848'];
 const WHITE = new Set([1,3,7,15,16]);
 const STAT = ['HP','Attack','Defense','Sp. Atk','Sp. Def','Speed'];
 /* same order as DATA.meths */
-const METH = ['Đi trong cỏ cao / hang','Cỏ đậm (trận đôi)','Bụi cỏ rung','Đám bụi trong hang','Bóng đen trên cầu','Lướt sóng (Surf)','Gợn nước khi Surf','Câu cá (Super Rod)','Câu ở gợn nước','Được tặng','Được tặng trứng','Gặp cố định (1 lần)'];
-const SEASON = ['Xuân','Hạ','Thu','Đông'];
+const METH = ['Tall grass / cave floor','Dark grass (double battles)','Rustling grass','Dust cloud in cave','Shadow on bridge','Surfing','Rippling water (Surf)','Fishing (Super Rod)','Fishing in rippling water','Gift','Gift egg','Fixed encounter (once)'];
+const SEASON = ['Spring','Summer','Autumn','Winter'];
+const CLASS = ['', 'Status', 'Physical', 'Special'];
 const byId = new Map(M.map(m => [m.i, m]));
 const kids = new Map();
 M.forEach(m => { if (m.f) { if (!kids.has(m.f)) kids.set(m.f, []); kids.get(m.f).push(m); } });
@@ -251,48 +288,63 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pad = n => String(n).padStart(3, '0');
 
-let party = new Set();
-try { party = new Set(JSON.parse(localStorage.getItem('party') || '[]')); } catch (e) {}
-const saveParty = () => { try { localStorage.setItem('party', JSON.stringify([...party])); } catch (e) {} $('team-n').textContent = party.size; };
+/* saved on this device only */
+const load = k => { try { return new Set(JSON.parse(localStorage.getItem(k) || '[]')); } catch (e) { return new Set(); } };
+const store = (k, v) => { try { localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify([...v])); } catch (e) {} };
+let party = load('party'), caught = load('caught');
+const saveParty = () => { store('party', party); $('team-n').textContent = party.size; };
+const saveCaught = () => store('caught', caught);
 
-const state = { dex: 'unova', q: '', type: -1, atk: 9, def: [11], allLocs: false };
+const state = { dex: 'unova', q: '', type: -1, onlyNew: false, atk: 9, def: [11], allLocs: false, allTms: false };
 
 /*SPRITES*/
-const tileStyle = m => `background:${mix(COL[m.t[0]], 255, .68)}`;
-const tile = m => `<img class="tile" src="${sprite(m)}" style="${tileStyle(m)}" alt="">`;
+const tile = m => `<img class="tile" src="${sprite(m)}" style="background:${mix(COL[m.t[0]], 255, .68)}" alt="">`;
 const badge = (t, tag = 'span', extra = '') =>
-  `<${tag} class="ty${WHITE.has(t) ? ' w' : ''}" style="background:${COL[t]}" title="${VI[t]}"${extra}>${T[t]}</${tag}>`;
+  `<${tag} class="ty${WHITE.has(t) ? ' w' : ''}" style="background:${COL[t]}"${extra}>${T[t]}</${tag}>`;
 const num = m => state.dex === 'unova' && m.u !== undefined ? pad(m.u) : pad(m.i);
+const marks = m => (party.has(m.i) ? ' <span class="star">★</span>' : '') + (caught.has(m.i) ? ' <span class="got">✔</span>' : '');
 
 function hint(m) {
   const k = kids.get(m.i);
   if (!k) return '<i>—</i>';
-  if (k.length > 1) return `<b>${k.length} nhánh</b>`;
+  if (k.length > 1) return `<b>${k.length} paths</b>`;
   return `<b>${esc(k[0].m[0][0])}</b>`;
 }
 const rowHTML = m => `<li><button class="row" data-id="${m.i}">
     ${tile(m)}
-    <span class="nm"><span class="no">#${num(m)}</span>${esc(m.n)}${party.has(m.i) ? ' <span class="star">★</span>' : ''}</span>
+    <span class="nm"><span class="no">#${num(m)}</span>${esc(m.n)}${marks(m)}</span>
     <span class="tys">${m.t.map(t => badge(t)).join('')}</span>
     <span class="ev">${hint(m)}</span></button></li>`;
 
 function dexOrder() {
   return state.dex === 'unova' ? M.filter(m => m.u !== undefined).sort((a, b) => a.u - b.u) : M;
 }
+/* every word must match: a type, the number, the name, an ability, or how it evolves next ("lv 17", "stone", "trade") */
+function matches(m, q) {
+  const lv = /^(?:lv|lvl|level)\.?\s*(\d+)$/.exec(q);
+  const next = (kids.get(m.i) || []).map(c => c.m.map(x => x[0]).join(' ')).join(' ').toLowerCase();
+  if (lv) return new RegExp('\\blv ' + lv[1] + '\\b').test(next);
+  return q.split(/\s+/).every(w => {
+    const n = w.replace(/^#?0*(?=\d)/, '');
+    if (/^\d+$/.test(n)) return String(m.i) === n || (state.dex === 'unova' && String(m.u) === n);
+    return m.n.toLowerCase().includes(w) || m.t.some(t => T[t].toLowerCase() === w) ||
+      m.a.some(a => DATA.abil[a[0]].toLowerCase().includes(w)) || next.includes(w);
+  });
+}
 function renderList() {
-  const q = state.q.trim().toLowerCase(), qn = q.replace(/^#?0*(?=\d)/, '');
-  const rows = dexOrder().filter(m =>
-    (state.type < 0 || m.t.includes(state.type)) &&
-    (!q || m.n.toLowerCase().includes(q) || String(m.i) === qn || (state.dex === 'unova' && String(m.u) === qn)));
-  $('count').textContent = rows.length + ' Pokémon · ô vàng = điều kiện tiến hóa tiếp theo';
+  const q = state.q.trim().toLowerCase();
+  const all = dexOrder();
+  const rows = all.filter(m =>
+    (state.type < 0 || m.t.includes(state.type)) && (!state.onlyNew || !caught.has(m.i)) && (!q || matches(m, q)));
+  $('count').textContent = `${rows.length} Pokémon · ${all.filter(m => caught.has(m.i)).length} of ${all.length} caught · yellow tag = next evolution`;
   $('list').innerHTML = rows.length ? rows.map(rowHTML).join('')
-    : '<li class="empty">Không tìm thấy Pokémon nào. Thử bấm “Tất cả 649” hoặc bỏ lọc hệ.</li>';
+    : '<li class="empty">No Pokémon match. Try “All 649”, or clear the type and Uncaught filters.</li>';
 }
 
 function defMult(ts) { return T.map((_, a) => ts.reduce((p, d) => p * C[a][d] / 100, 1)); }
 function effRows(groups) {
   return groups.map(([label, cls, list]) =>
-    `<div class="mult ${cls}">${label}</div><div class="tys">${list.length ? list.map(t => badge(t)).join('') : '<span class="none">không có</span>'}</div>`).join('');
+    `<div class="mult ${cls}">${label}</div><div class="tys">${list.length ? list.map(t => badge(t)).join('') : '<span class="none">none</span>'}</div>`).join('');
 }
 function defBlock(ts) {
   const m = defMult(ts), pick = v => m.map((x, i) => x === v ? i : -1).filter(i => i >= 0);
@@ -311,31 +363,70 @@ function atkBlock(t) {
   return effRows(g);
 }
 
-const monBtn = (m, me) => `<button class="mon${m.i === me ? ' me' : ''}" data-id="${m.i}"><img src="${sprite(m)}" alt="">${esc(m.n)}</button>`;
+const monBtn = (m, me) => `<button class="mon${m.i === me ? ' me' : ''}" data-id="${m.i}"><img src="${sprite(m)}" alt="">${esc(m.n)}${caught.has(m.i) ? ' <span class="got">✔</span>' : ''}</button>`;
+const lvText = (lo, hi) => lo === hi ? 'Lv ' + lo : `Lv ${lo}–${hi}`;
+const rateText = (r0, r1) => r1 ? `<b>${r0 === r1 ? r1 : r0 + '–' + r1}%</b>` : '';
+const seasonText = mask => mask !== 15 ? SEASON.filter((_, i) => mask >> i & 1).join(', ') + ' only' : '';
 
 function locLine(e) {
   const [li, mi, lo, hi, r0, r1, mask, note] = e;
-  const lv = lo === hi ? 'Lv ' + lo : `Lv ${lo}–${hi}`;
-  const seas = mask !== 15 ? ' · chỉ mùa ' + SEASON.filter((_, i) => mask >> i & 1).join(', ') : '';
-  const rate = r1 ? `<b>${r0 === r1 ? r1 : r0 + '–' + r1}%</b>` : '';
-  return `<div class="loc"><div class="pl">${esc(LOCS[li])}</div><div class="how">${METH[mi]}${note ? ' · ' + esc(note) : ''}${seas}</div><div class="rt">${lv} ${rate}</div></div>`;
+  const extra = [METH[mi], note, seasonText(mask)].filter(Boolean).join(' · ');
+  return `<div class="loc"><button class="pl" data-loc="${li}">${esc(LOCS[li])}</button><div class="how">${esc(extra)}</div><div class="rt">${lvText(lo, hi)} ${rateText(r0, r1)}</div></div>`;
 }
 function locBlock(m) {
   if (m.e) {
     const LIMIT = 6, list = state.allLocs ? m.e : m.e.slice(0, LIMIT);
     return `<div class="locs">${list.map(locLine).join('')}</div>` +
-      (m.e.length > LIMIT ? `<button class="btn more" id="more-locs">${state.allLocs ? 'Thu gọn ▲' : `Xem thêm ${m.e.length - LIMIT} nơi ▼`}</button>` : '');
+      (m.e.length > LIMIT ? `<button class="btn flat wide" id="more-locs">${state.allLocs ? 'Show fewer ▲' : `Show ${m.e.length - LIMIT} more places ▼`}</button>` : '');
   }
   const fam = M.filter(x => x.c === m.c && x.i !== m.i);
   const src = fam.filter(x => x.e);
   if (src.length) {
     const isAncestor = x => { for (let p = m; p && p.f; p = byId.get(p.f)) if (p.f === x.i) return true; return false; };
-    return `<p class="warn">Không gặp ${esc(m.n)} ngoài tự nhiên trong White. Hãy bắt con cùng họ rồi ${src.some(isAncestor) ? 'cho tiến hóa' : 'cho đẻ trứng'}:</p>
-      <div class="locs">${src.map(x => `<div class="loc"><div class="pl">${monBtn(x, m.i)}</div><div class="how">${esc(LOCS[x.e[0][0]])} · ${METH[x.e[0][1]]}</div><div class="rt">Lv ${x.e[0][2]}${x.e[0][3] !== x.e[0][2] ? '–' + x.e[0][3] : ''}</div></div>`).join('')}</div>`;
+    return `<p class="warn">${esc(m.n)} is not found in the wild in White. Catch a relative and ${src.some(isAncestor) ? 'evolve it' : 'breed it'}:</p>
+      <div class="locs">${src.map(x => `<div class="loc"><div class="pl plain">${monBtn(x, m.i)}</div><div class="how">${esc(LOCS[x.e[0][0]])} · ${METH[x.e[0][1]]}</div><div class="rt">${lvText(x.e[0][2], x.e[0][3])}</div></div>`).join('')}</div>`;
   }
   if (m.bo || fam.some(x => x.bo))
-    return `<p class="warn">Chỉ có ở bản <b>Black</b>. Muốn có trong White phải trao đổi với người chơi Black.</p>`;
-  return `<p class="warn">Không bắt được trong cốt truyện White. Cần chuyển từ game đời trước (Poké Transfer), nhận qua sự kiện, hoặc tìm ở White Forest.</p>`;
+    return `<p class="warn">Black version only. To get one in White you need to trade with a Black player.</p>`;
+  return `<p class="warn">Not obtainable in White's own story. It has to come from an older game (Poké Transfer), an event, or a trade.</p>`;
+}
+
+function moveLine(label, idx, m) {
+  const [name, ty, cls, pw, acc, pp] = MOVES[idx];
+  const stab = cls > 1 && m.t.includes(ty) ? ' · <b>STAB</b>' : '';
+  const nums = cls > 1 ? ` · Pwr ${pw > 1 ? pw : '—'}` : '';
+  return `<div class="mv"><span class="lv">${label}</span><span class="mn">${esc(name)}</span>${badge(ty)}<span class="ms">${CLASS[cls]}${nums} · Acc ${acc || '—'} · PP ${pp}${stab}</span></div>`;
+}
+function tmList(m) {
+  const bits = BigInt('0x' + (m.tm || '0'));
+  return TMS.filter((_, i) => bits >> BigInt(i) & 1n);
+}
+function moveBlock(m) {
+  const tms = tmList(m);
+  return `<div class="sub">Learned by level</div>
+    <div>${m.lm.length ? m.lm.map(([lv, i]) => moveLine(lv > 1 ? 'Lv ' + lv : 'Start', i, m)).join('') : '<p class="note">No level-up moves.</p>'}</div>
+    <div class="sub">TMs and HMs it can use · ${tms.length}</div>
+    ${tms.length ? (state.allTms ? `<div>${tms.map(([lb, i]) => moveLine(lb, i, m)).join('')}</div>` : '') +
+      `<button class="btn flat wide" id="more-tms">${state.allTms ? 'Hide TM list ▲' : `Show ${tms.length} TMs and HMs ▼`}</button>` : '<p class="note">Cannot use any TM or HM.</p>'}`;
+}
+
+function facts(m) {
+  const inches = Math.round(m.ht * 3.937), lbs = (m.wt * 0.220462).toFixed(1);
+  const gender = m.gr < 0 ? 'Genderless' : m.gr === 0 ? '100% ♂' : m.gr === 8 ? '100% ♀' : `${100 - m.gr * 12.5}% ♂ · ${m.gr * 12.5}% ♀`;
+  const abil = m.a.map(([a, h]) => esc(DATA.abil[a]) + (h ? ' <small>(hidden, Dream World)</small>' : '')).join('<br>');
+  const rows = [
+    ['Species', esc(m.ge)],
+    ['Height', `${Math.floor(inches / 12)}′${String(inches % 12).padStart(2, '0')}″ <small>(${(m.ht / 10).toFixed(1)} m)</small>`],
+    ['Weight', `${lbs} lbs <small>(${(m.wt / 10).toFixed(1)} kg)</small>`],
+    ['Abilities', abil || '—'],
+    ['Gender', gender],
+    ['Catch rate', `${m.cr} <small>(of 255, higher is easier)</small>`],
+    ['Egg groups', m.eg.map(i => DATA.egg[i]).join(', ')],
+    ['Growth', DATA.growth[m.gw]],
+    ['Base Exp', m.bx],
+    ['EV yield', m.ev.map(([s, v]) => `${v} ${STAT[s]}`).join(', ') || '—'],
+  ];
+  return `<dl class="facts">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
 }
 
 let lastList = '';
@@ -345,95 +436,185 @@ function renderDetail(m) {
   const edges = fam.filter(x => x.f).sort((a, b) => depth(a) - depth(b) || a.i - b.i);
   const k = kids.get(m.i) || [];
   const next = k.length
-    ? `<div class="next">${k.map(c => `<div><div class="lv">▲ ${esc(c.n)}</div><div>${c.m.map(x => esc(x[1])).join(' — hoặc — ')}</div></div>`).join('')}</div>`
-    : `<div class="next done">${m.f ? 'Đây là dạng cuối, không tiến hóa nữa.' : 'Pokémon này không tiến hóa.'}</div>`;
+    ? `<div class="next">${k.map(c => `<div><div class="lv">▲ ${esc(c.n)}</div><div>${c.m.map(x => esc(x[1])).join(' — or — ')}</div></div>`).join('')}</div>`
+    : `<div class="next done">${m.f ? 'Final form. It does not evolve further.' : 'This Pokémon does not evolve.'}</div>`;
   const total = m.s.reduce((a, b) => a + b, 0);
-  const inParty = party.has(m.i);
   let order = dexOrder(), at = order.indexOf(m);
   if (at < 0) { order = M; at = order.indexOf(m); }
   const prev = order[at - 1], nxt = order[at + 1];
   $('view-detail').innerHTML = `
     <div class="dnav">
-      <button class="btn grow" id="back">◀ ${lastList === 'team' ? 'Đội' : 'Danh sách'}</button>
-      <button class="btn step" ${prev ? `data-id="${prev.i}"` : 'disabled'} aria-label="Pokémon trước${prev ? ': ' + esc(prev.n) : ''}">▲ Trước</button>
-      <button class="btn step" ${nxt ? `data-id="${nxt.i}"` : 'disabled'} aria-label="Pokémon sau${nxt ? ': ' + esc(nxt.n) : ''}">Sau ▼</button>
+      <button class="btn grow" id="back">◀ Back</button>
+      <button class="btn" ${prev ? `data-id="${prev.i}"` : 'disabled'} aria-label="Previous Pokémon${prev ? ': ' + esc(prev.n) : ''}">▲ Prev</button>
+      <button class="btn" ${nxt ? `data-id="${nxt.i}"` : 'disabled'} aria-label="Next Pokémon${nxt ? ': ' + esc(nxt.n) : ''}">Next ▼</button>
     </div>
     <section class="box hero">
       ${tile(m)}
       <div>
         <div class="no">NATIONAL #${pad(m.i)}${m.u !== undefined ? ' · UNOVA #' + pad(m.u) : ''}</div>
         <h2>${esc(m.n)}</h2>
-        <div class="tys">${m.t.map(t => badge(t)).join('')}<span class="vi">${m.t.map(t => VI[t]).join(' / ')}</span></div>
+        <div class="ge">${esc(m.ge)}</div>
+        <div class="tys">${m.t.map(t => badge(t)).join('')}</div>
       </div>
       <div class="acts">
-        <button class="btn" id="party-btn" aria-pressed="${inParty}">${inParty ? '★ Trong đội (bỏ)' : '☆ Thêm vào đội'}</button>
-        <a class="btn" href="https://pokemondb.net/sprites/${m.g}" target="_blank" rel="noopener">▣ Hình gốc ↗</a>
+        <button class="btn flat" id="party-btn" aria-pressed="${party.has(m.i)}">${party.has(m.i) ? '★ In team' : '☆ Team'}</button>
+        <button class="btn flat" id="caught-btn" aria-pressed="${caught.has(m.i)}">${caught.has(m.i) ? '✔ Caught' : '○ Caught'}</button>
+        <a class="btn flat" href="https://pokemondb.net/sprites/${m.g}" target="_blank" rel="noopener">Sprites ↗</a>
       </div>
     </section>
-    <nav class="jump" aria-label="Nhảy tới mục">
-      <button class="chip" data-go="s-evo">Tiến hóa</button>
-      <button class="chip" data-go="s-loc">Nơi bắt</button>
-      <button class="chip" data-go="s-atk">Đánh</button>
-      <button class="chip" data-go="s-def">Thủ</button>
-      <button class="chip" data-go="s-stat">Chỉ số</button>
+    <nav class="jump" aria-label="Jump to section">
+      <button class="chip" data-go="s-evo">Evolve</button>
+      <button class="chip" data-go="s-loc">Catch</button>
+      <button class="chip" data-go="s-mov">Moves</button>
+      <button class="chip" data-go="s-atk">Types</button>
+      <button class="chip" data-go="s-data">Data</button>
     </nav>
     <section class="box" id="s-evo">
-      <h2><span class="ico">▶</span>Tiến hóa</h2>
+      <h2><span class="ico">▶</span>Evolution</h2>
       ${next}
       ${edges.length ? `<div class="edges">${edges.map(e => `<div class="edge">
         <div class="pair">${monBtn(byId.get(e.f), m.i)}<span>→</span>${monBtn(e, m.i)}</div>
-        <div class="how">${e.m.map(x => esc(x[1])).join('<br>hoặc ')}</div></div>`).join('')}</div>` : ''}
+        <div class="how">${e.m.map(x => esc(x[1])).join('<br>or ')}</div></div>`).join('')}</div>` : ''}
     </section>
     <section class="box" id="s-loc">
-      <h2><span class="ico">▶</span>Nơi bắt trong White</h2>
+      <h2><span class="ico">▶</span>Where to catch in White</h2>
       ${locBlock(m)}
-      <p class="note" style="margin-top:10px">% = tỉ lệ gặp theo cách tìm đó. Chưa gồm White Forest và các đợt bầy đàn (swarm).</p>
+      <p class="note" style="margin-top:10px">% is the encounter rate for that method. Tap a place to see everything found there. Swarms are not listed.</p>
+    </section>
+    <section class="box" id="s-mov">
+      <h2><span class="ico">▶</span>Moves in Black/White</h2>
+      ${moveBlock(m)}
     </section>
     <section class="box" id="s-atk">
-      <h2><span class="ico">▶</span>Đánh hệ nào mạnh</h2>
-      <p class="note">Khi ${esc(m.n)} dùng chiêu cùng hệ với nó (được thưởng ×1.5 sát thương).</p>
-      ${m.t.map(t => `<div class="sub">Chiêu hệ ${badge(t)}</div><div class="eff">${atkBlock(t)}</div>`).join('')}
+      <h2><span class="ico">▶</span>Attacking</h2>
+      <p class="note">What ${esc(m.n)}'s own-type moves hit hard. Own-type moves also get ×1.5 damage (STAB).</p>
+      ${m.t.map(t => `<div class="sub">${badge(t)} moves</div><div class="eff">${atkBlock(t)}</div>`).join('')}
     </section>
     <section class="box" id="s-def">
-      <h2><span class="ico">▶</span>Thủ: sợ hệ nào</h2>
-      <p class="note">Sát thương ${esc(m.n)} nhận vào theo hệ của chiêu đối thủ.</p>
+      <h2><span class="ico">▶</span>Defending</h2>
+      <p class="note">Damage ${esc(m.n)} takes, by the type of the incoming move.</p>
       <div class="eff">${defBlock(m.t)}</div>
     </section>
-    <section class="box" id="s-stat">
-      <h2><span class="ico">▶</span>Chỉ số gốc · tổng ${total}</h2>
+    <section class="box" id="s-data">
+      <h2><span class="ico">▶</span>Pokédex data</h2>
+      ${facts(m)}
+    </section>
+    <section class="box">
+      <h2><span class="ico">▶</span>Base stats · total ${total}</h2>
       <div class="stats">${m.s.map((v, i) => `<span>${STAT[i]}</span><span class="v">${v}</span><span class="bar"><i style="width:${Math.min(100, v / 2)}%"></i></span>`).join('')}</div>
     </section>`;
 }
 
+/* ---- places ---- */
+const atPlace = new Map();
+M.forEach(m => (m.e || []).forEach(e => { if (!atPlace.has(e[0])) atPlace.set(e[0], []); atPlace.get(e[0]).push([m, e]); }));
+const speciesAt = li => new Set((atPlace.get(li) || []).map(x => x[0].i));
+function renderPlaces() {
+  $('view-places').innerHTML = `<p class="note">Pick a place to see every Pokémon found there in White, and which ones you still need.</p>
+    <ul class="list">${LOCS.map((n, li) => {
+      const s = [...speciesAt(li)], left = s.filter(i => !caught.has(i)).length;
+      return `<li><button class="row prow" data-loc="${li}"><span>${esc(n)}</span><span>${left ? left + ' to catch' : '✔ all caught'} · ${s.length}</span></button></li>`;
+    }).join('')}</ul>`;
+}
+function renderPlace(li) {
+  const rows = atPlace.get(li) || [], s = [...speciesAt(li)];
+  const groups = METH.map((label, mi) => [label, rows.filter(x => x[1][1] === mi).sort((a, b) => b[1][5] - a[1][5] || a[1][2] - b[1][2])]).filter(g => g[1].length);
+  $('view-place').innerHTML = `
+    <div class="dnav"><button class="btn grow" id="back-places">◀ Places</button></div>
+    <section class="box"><h2><span class="ico">▶</span>${esc(LOCS[li])}</h2>
+      <p class="note">${s.length} species · ${s.filter(i => caught.has(i)).length} caught. ✔ marks the ones you already have.</p></section>
+    ${groups.map(([label, list]) => `<section class="box"><h2><span class="ico">▶</span>${label}</h2><div class="locs">${list.map(([m, e]) => {
+      const extra = [e[7], seasonText(e[6])].filter(Boolean).join(' · ');
+      return `<div class="loc"><div>${monBtn(m, 0)}</div><div class="rt">${lvText(e[2], e[3])} ${rateText(e[4], e[5])}</div>${extra ? `<div class="how" style="grid-column:1/-1">${esc(extra)}</div>` : ''}</div>`;
+    }).join('')}</div></section>`).join('')}`;
+}
+
+/* ---- bosses ---- */
+function bossBox([group, name, where, note, ty, team]) {
+  const mons = team.map(([id, lv]) => [byId.get(id), lv]);
+  const hits = T.map((_, a) => [a, mons.filter(([m]) => defMult(m.t)[a] >= 2).length]).filter(x => x[1]).sort((x, y) => y[1] - x[1]).slice(0, 5);
+  const mine = [...party].map(i => byId.get(i)).filter(Boolean)
+    .map(p => [p, mons.filter(([m]) => p.t.some(a => defMult(m.t)[a] >= 2)).length]).filter(x => x[1]).sort((x, y) => y[1] - x[1]);
+  return `<section class="box"><h2><span class="ico">▶</span>${esc(name)}${ty >= 0 ? `<span class="end">${badge(ty)}</span>` : ''}</h2>
+    <p class="note">${esc(where)}${note ? ' · ' + esc(note) : ''}</p>
+    <div class="squad">${mons.map(([m, lv]) => `<div class="m">${monBtn(m, 0)}<span class="r"><span class="l">Lv ${lv}</span>${m.t.map(t => badge(t)).join('')}</span></div>`).join('')}</div>
+    <div class="sub">Best move types to bring</div>
+    <div class="tips">${hits.map(([a, n]) => `<span class="t">${badge(a)}hits ${n} of ${mons.length}</span>`).join('')}</div>
+    ${party.size ? `<div class="sub">From your team</div><div class="tips">${mine.length ? mine.map(([p, n]) => `<span class="t">${esc(p.n)} · ${n} of ${mons.length}</span>`).join('') : '<span class="t" style="color:var(--mute)">Nobody has a type advantage yet.</span>'}</div>` : ''}
+  </section>`;
+}
+function renderBosses() {
+  let last = '';
+  $('view-bosses').innerHTML = `<p class="note">Teams for the first playthrough of White, then the post-game rematches. “Hits” counts opponents weak to that move type.</p>` +
+    DATA.bosses.map(b => (b[0] !== last ? `<h3 class="group">${last = b[0]}</h3>` : '') + bossBox(b)).join('');
+}
+
+/* ---- team ---- */
 function renderTeam() {
   const team = [...party].map(i => byId.get(i)).filter(Boolean);
   if (!team.length) {
-    $('view-team').innerHTML = `<section class="box"><h2><span class="ico">▶</span>Đội của tôi</h2>
-      <p class="note">Đội đang trống. Mở một Pokémon bạn đang nuôi rồi bấm “☆ Thêm vào đội”. Ở đây sẽ hiện ai trong đội đánh mạnh hệ nào và cả đội đang sợ hệ nào.</p>
-      <button class="btn" id="team-go">◉ Mở danh sách Pokémon</button></section>`;
+    $('view-team').innerHTML = `<section class="box"><h2><span class="ico">▶</span>My team</h2>
+      <p class="note">Your team is empty. Open a Pokémon you are using and tap “☆ Team”. This page then shows who to send out against each type, and what your whole team is weak to.</p>
+      <button class="btn" id="team-go">Open the Pokédex</button></section>`;
     return;
   }
   const cover = T.map((_, d) => team.filter(m => m.t.some(a => C[a][d] === 200)));
   const weak = T.map((_, a) => [a, team.filter(m => defMult(m.t)[a] >= 2)]).filter(x => x[1].length >= Math.min(2, team.length)).sort((x, y) => y[1].length - x[1].length);
   $('view-team').innerHTML = `
-    <section class="box"><h2><span class="ico">▶</span>Đội của tôi · ${team.length} Pokémon</h2>
+    <section class="box"><h2><span class="ico">▶</span>My team · ${team.length}</h2>
       <ul class="list">${team.map(rowHTML).join('')}</ul></section>
-    <section class="box"><h2><span class="ico">▶</span>Gặp hệ nào thì dùng ai</h2>
-      <p class="note">Ai có chiêu cùng hệ đánh ×2 vào đối thủ hệ đó.</p>
-      <div class="cover">${cover.map((l, d) => `${badge(d)}<span class="who${l.length ? '' : ' no'}">${l.length ? l.map(m => esc(m.n)).join(', ') : 'chưa có ai'}</span>`).join('')}</div></section>
-    <section class="box"><h2><span class="ico">▶</span>Cả đội cùng sợ</h2>
-      ${weak.length ? `<p class="note">Hệ chiêu đánh ×2 trở lên vào ${team.length > 1 ? 'từ 2 thành viên' : 'thành viên này'}.</p>
+    <section class="box"><h2><span class="ico">▶</span>Who to use against…</h2>
+      <p class="note">Team members whose own-type moves hit that type for ×2.</p>
+      <div class="cover">${cover.map((l, d) => `${badge(d)}<span class="who${l.length ? '' : ' no'}">${l.length ? l.map(m => esc(m.n)).join(', ') : 'nobody yet'}</span>`).join('')}</div></section>
+    <section class="box"><h2><span class="ico">▶</span>Shared weaknesses</h2>
+      ${weak.length ? `<p class="note">Move types that hit ${team.length > 1 ? 'two or more members' : 'this member'} for ×2 or more.</p>
       <div class="cover">${weak.map(([a, l]) => `${badge(a)}<span class="who">${l.map(m => esc(m.n)).join(', ')}</span>`).join('')}</div>`
-      : '<p class="note">Không có hệ nào đánh mạnh vào 2 thành viên trở lên.</p>'}</section>`;
+      : '<p class="note">No move type hits two or more members hard.</p>'}</section>`;
+}
+
+/* ---- options ---- */
+const ZOOMS = [['Small', .9], ['Normal', 1], ['Large', 1.15], ['Largest', 1.3]];
+let zoom = 1;
+try { zoom = +localStorage.getItem('zoom') || 1; } catch (e) {}
+const applyZoom = () => { document.body.style.zoom = zoom === 1 ? '' : zoom; };
+const makeCode = () => 'PDX1.' + btoa(JSON.stringify({ t: [...party], c: [...caught] }));
+function readCode(text) {
+  const d = JSON.parse(atob(text.trim().replace(/^PDX1\./, '')));
+  const ok = a => Array.isArray(a) && a.every(i => byId.has(i));
+  if (!ok(d.t) || !ok(d.c)) throw new Error('bad');
+  return d;
+}
+let optMsg = '';
+function renderMore() {
+  const un = M.filter(m => m.u !== undefined), cu = un.filter(m => caught.has(m.i)).length;
+  $('view-more').innerHTML = `
+    <section class="box"><h2><span class="ico">▶</span>Progress</h2>
+      <div>Unova Pokédex · ${cu} of ${un.length} caught</div><div class="meter"><i style="width:${cu / un.length * 100}%"></i></div>
+      <div>All Pokémon · ${caught.size} of ${M.length} caught</div><div class="meter" style="margin-bottom:0"><i style="width:${caught.size / M.length * 100}%"></i></div></section>
+    <section class="box"><h2><span class="ico">▶</span>Text size</h2>
+      <div class="sizes">${ZOOMS.map(([n, z]) => `<button class="btn flat" data-zoom="${z}" aria-pressed="${z === zoom}">${n}</button>`).join('')}</div></section>
+    <section class="box"><h2><span class="ico">▶</span>Backup</h2>
+      <p class="note">Your team and caught list live only on this device. Copy this code somewhere safe (Notes, a message to yourself) to keep them.</p>
+      <textarea class="code" id="code-out" readonly aria-label="Backup code">${makeCode()}</textarea>
+      <button class="btn flat wide" id="code-copy">Copy backup code</button>
+      <div class="sub" style="margin-top:14px">Restore from a code</div>
+      <textarea class="code" id="code-in" placeholder="Paste a backup code here" aria-label="Backup code to restore"></textarea>
+      <button class="btn flat wide" id="code-load">Restore (replaces current team and caught list)</button>
+      <p class="status" id="opt-msg" role="status">${esc(optMsg)}</p></section>
+    <section class="box"><h2><span class="ico">▶</span>About the data</h2>
+      <p class="note">Everything follows Generation V rules as in Pokémon White: 17 types with no Fairy, Gen V base stats, abilities, move power and evolution methods.</p>
+      <p class="note">Game data comes from PokeAPI. Boss teams and the White Forest list come from Pokémon Database. Swarms and Dream World encounters are not included, and moves use their current English names.</p>
+      <p class="note">The pixel pictures are original mascots drawn from each Pokémon's body shape, colour and type. They are not the game's sprites; use “Sprites ↗” on a Pokémon's page to see those.</p></section>`;
+  optMsg = '';
 }
 
 function renderTypes() {
   $('atk-pick').innerHTML = T.map((_, t) => badge(t, 'button', ` data-t="${t}" aria-pressed="${state.atk === t}"`)).join('');
-  $('atk-out').innerHTML = `<div class="lbl">Chiêu hệ ${T[state.atk]} (${VI[state.atk]}) đánh vào:</div>` + atkBlock(state.atk);
+  $('atk-out').innerHTML = `<div class="lbl">${T[state.atk]} moves against:</div>` + atkBlock(state.atk);
   $('def-pick').innerHTML = T.map((_, t) => badge(t, 'button', ` data-t="${t}" aria-pressed="${state.def.includes(t)}"`)).join('');
   $('def-out').innerHTML = state.def.length
-    ? `<div class="lbl">Đối thủ hệ ${state.def.map(t => T[t]).join(' / ')} nhận sát thương từ chiêu hệ:</div>` + defBlock(state.def)
-    : '<div class="lbl">Chọn ít nhất 1 hệ ở trên.</div>';
+    ? `<div class="lbl">A ${state.def.map(t => T[t]).join(' / ')} opponent takes, by move type:</div>` + defBlock(state.def)
+    : '<div class="lbl">Pick at least one type above.</div>';
 }
 function renderMatrix() {
   const ab = t => T[t].slice(0, 3).toUpperCase(), cls = t => WHITE.has(t) ? ' class="w"' : '';
@@ -442,33 +623,42 @@ function renderMatrix() {
       v === 200 ? '<td class="g">2</td>' : v === 50 ? '<td class="b">½</td>' : v === 0 ? '<td class="z">0</td>' : '<td></td>').join('')}</tr>`).join('') + '</tbody>';
 }
 
+/* ---- routing: '', pN, types, places, lN, bosses, team, more ---- */
+const VIEWS = ['list', 'detail', 'types', 'places', 'place', 'bosses', 'team', 'more'];
 const scrolls = {};
-let current = 'list';
+let currentHash = '', currentView = 'list';
 function route() {
   const h = location.hash.replace('#', '');
-  const pm = /^p(\d+)$/.exec(h);
-  const view = pm && byId.has(+pm[1]) ? 'detail' : h === 'types' ? 'types' : h === 'team' ? 'team' : 'list';
-  if (current !== 'detail') scrolls[current] = window.scrollY;
-  if (view === 'list') lastList = ''; else if (view === 'team') lastList = 'team';
-  ['list', 'detail', 'team', 'types'].forEach(v => { $('view-' + v).hidden = v !== view; });
-  const tab = view === 'types' ? 'types' : view === 'team' || (view === 'detail' && lastList === 'team') ? 'team' : 'dex';
-  ['dex', 'types', 'team'].forEach(t => $('tab-' + t).setAttribute('aria-selected', t === tab));
-  if (view === 'detail') { state.allLocs = false; renderDetail(byId.get(+pm[1])); window.scrollTo(0, 0); }
-  else {
-    if (view === 'types') renderTypes(); else if (view === 'team') renderTeam(); else renderList();
-    window.scrollTo(0, current === 'detail' ? scrolls[view] || 0 : 0);
-  }
-  current = view;
+  const pm = /^p(\d+)$/.exec(h), lm = /^l(\d+)$/.exec(h);
+  const view = pm && byId.has(+pm[1]) ? 'detail' : lm && LOCS[+lm[1]] ? 'place' : VIEWS.includes(h) && h !== 'list' && h !== 'detail' && h !== 'place' ? h : 'list';
+  scrolls[currentHash] = window.scrollY;
+  if (view !== 'detail') lastList = view === 'list' ? '' : h;
+  VIEWS.forEach(v => { $('view-' + v).hidden = v !== view; });
+  const root = view === 'detail' ? (/^l\d+$/.test(lastList) ? 'places' : lastList || 'dex') : view === 'place' ? 'places' : view === 'list' ? 'dex' : view;
+  ['dex', 'types', 'places', 'bosses', 'team'].forEach(t => $('tab-' + t).setAttribute('aria-selected', t === root));
+  $('open-more').setAttribute('aria-pressed', view === 'more');
+  const cameBack = currentView === 'detail' || (currentView === 'place' && view === 'places');
+  if (view === 'detail') { state.allLocs = state.allTms = false; renderDetail(byId.get(+pm[1])); }
+  else if (view === 'place') renderPlace(+lm[1]);
+  else ({ list: renderList, types: renderTypes, places: renderPlaces, bosses: renderBosses, team: renderTeam, more: renderMore })[view]();
+  window.scrollTo(0, cameBack && view !== 'detail' ? scrolls[h] || 0 : 0);
+  currentHash = h; currentView = view;
 }
 const go = h => { if (location.hash.replace('#', '') === h) route(); else location.hash = h; };
+/* any element with data-id opens that Pokémon, data-loc that place */
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-id]'); if (a) return go('p' + a.dataset.id);
+  const l = e.target.closest('[data-loc]'); if (l) return go('l' + l.dataset.loc);
+});
 
 $('typebar').innerHTML = T.map((_, t) => badge(t, 'button', ` data-t="${t}" aria-pressed="false"`)).join('');
 function syncFilters() {
   $('dex-unova').setAttribute('aria-pressed', state.dex === 'unova');
   $('dex-nat').setAttribute('aria-pressed', state.dex === 'nat');
+  $('only-new').setAttribute('aria-pressed', state.onlyNew);
   $('typebar').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.t === state.type)));
-  $('type-toggle').textContent = state.type < 0 ? 'Lọc hệ ▾' : `Hệ: ${T[state.type]} ✕`;
-  try { localStorage.setItem('dex', state.dex); } catch (e) {}
+  $('type-toggle').textContent = state.type < 0 ? 'Type ▾' : `${T[state.type]} ✕`;
+  store('dex', state.dex);
   renderList();
 }
 const showTypes = on => { $('typebar').hidden = !on; $('type-toggle').setAttribute('aria-expanded', on); };
@@ -477,37 +667,47 @@ try { if (localStorage.getItem('dex') === 'nat') state.dex = 'nat'; } catch (e) 
 $('q').addEventListener('input', e => { state.q = e.target.value; renderList(); });
 $('dex-unova').onclick = () => { state.dex = 'unova'; syncFilters(); };
 $('dex-nat').onclick = () => { state.dex = 'nat'; syncFilters(); };
+$('only-new').onclick = () => { state.onlyNew = !state.onlyNew; syncFilters(); };
 $('type-toggle').onclick = () => {
   if (state.type >= 0) { state.type = -1; showTypes(false); syncFilters(); }
   else showTypes($('typebar').hidden);
 };
 $('typebar').onclick = e => { const b = e.target.closest('button'); if (!b) return; state.type = +b.dataset.t; showTypes(false); syncFilters(); window.scrollTo(0, 0); };
-$('list').onclick = e => { const b = e.target.closest('[data-id]'); if (b) go('p' + b.dataset.id); };
 $('tab-dex').onclick = () => go('');
-$('tab-types').onclick = () => go('types');
-$('tab-team').onclick = () => go('team');
-$('view-team').onclick = e => {
-  if (e.target.closest('#team-go')) return go('');
-  const b = e.target.closest('[data-id]'); if (b) go('p' + b.dataset.id);
-};
+['types', 'places', 'bosses', 'team'].forEach(t => { $('tab-' + t).onclick = () => go(t); });
+$('open-more').onclick = () => go(currentView === 'more' ? '' : 'more');
+$('view-team').addEventListener('click', e => { if (e.target.closest('#team-go')) go(''); });
+$('view-place').addEventListener('click', e => { if (e.target.closest('#back-places')) go('places'); });
 const smooth = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-$('view-detail').onclick = e => {
+$('view-detail').addEventListener('click', e => {
   if (e.target.closest('#back')) return go(lastList);
   const id = +location.hash.slice(2);
   const j = e.target.closest('[data-go]');
   if (j) return $(j.dataset.go).scrollIntoView({ behavior: smooth(), block: 'start' });
-  const mb = e.target.closest('[data-id]');
-  if (mb) return go('p' + mb.dataset.id);
-  if (e.target.closest('#more-locs')) {
-    state.allLocs = !state.allLocs;
-    const y = window.scrollY; renderDetail(byId.get(id)); window.scrollTo(0, y); return;
+  const again = () => { const y = window.scrollY; renderDetail(byId.get(id)); window.scrollTo(0, y); };
+  if (e.target.closest('#more-locs')) { state.allLocs = !state.allLocs; again(); }
+  else if (e.target.closest('#more-tms')) { state.allTms = !state.allTms; again(); }
+  else if (e.target.closest('#party-btn')) { party.has(id) ? party.delete(id) : party.add(id); saveParty(); again(); }
+  else if (e.target.closest('#caught-btn')) { caught.has(id) ? caught.delete(id) : caught.add(id); saveCaught(); again(); }
+});
+$('view-more').addEventListener('click', e => {
+  const z = e.target.closest('[data-zoom]');
+  if (z) { zoom = +z.dataset.zoom; store('zoom', String(zoom)); applyZoom(); return renderMore(); }
+  if (e.target.closest('#code-copy')) {
+    const box = $('code-out'), done = t => { $('opt-msg').textContent = t; };
+    const fallback = () => { box.focus(); box.select(); done('Code selected. Use Copy from the menu.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(box.value).then(() => done('Backup code copied.'), fallback);
+    else fallback();
   }
-  if (e.target.closest('#party-btn')) {
-    party.has(id) ? party.delete(id) : party.add(id);
-    saveParty();
-    const y = window.scrollY; renderDetail(byId.get(id)); window.scrollTo(0, y);
+  if (e.target.closest('#code-load')) {
+    try {
+      const d = readCode($('code-in').value);
+      party = new Set(d.t); caught = new Set(d.c); saveParty(); saveCaught();
+      optMsg = `Restored ${d.t.length} team members and ${d.c.length} caught Pokémon.`;
+      renderMore();
+    } catch (err) { $('opt-msg').textContent = 'That code is not valid. Paste the whole code, starting with PDX1.'; }
   }
-};
+});
 $('atk-pick').onclick = e => { const b = e.target.closest('button'); if (b) { state.atk = +b.dataset.t; renderTypes(); } };
 $('def-pick').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -517,5 +717,5 @@ $('def-pick').onclick = e => {
 };
 window.addEventListener('hashchange', route);
 $('team-n').textContent = party.size;
-renderMatrix(); syncFilters(); route();
+applyZoom(); renderMatrix(); syncFilters(); route();
 </script>
