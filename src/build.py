@@ -301,7 +301,10 @@ open(D + 'data.json', 'w', encoding='utf-8').write(blob)
 
 html = open(SRC + 'page.html', encoding='utf-8').read()
 html = html.replace('/*SPRITES*/', open(SRC + 'sprites.js', encoding='utf-8').read()).replace('/*DATA*/', blob)
-open(D + 'artifact.html', 'w', encoding='utf-8').write(html)
+# the claude.ai copy cannot load outside images, so it keeps the drawn mascots
+artifact, n = re.subn(r"const SPRITE_URL = '[^']*';", "const SPRITE_URL = '';", html)
+assert n == 1
+open(D + 'artifact.html', 'w', encoding='utf-8').write(artifact)
 
 # ---- installable (PWA) build: full document, local fonts, manifest, service worker ----
 body = html.replace('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">', '')
@@ -356,15 +359,27 @@ ver = hashlib.sha1((doc + open(ROOT + 'fonts.css').read()).encode()).hexdigest()
 SW = """/* Offline cache. The version changes whenever the page changes, so an update replaces the old copy. */
 const CACHE = 'pokedex-%s';
 const ASSETS = %s;
+/* Pokémon sprites are kept as you view them, in their own cache that survives app updates. */
+const SPRITES = 'pokedex-sprites-v1';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && k !== SPRITES).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', e => {
   const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.hostname === 'raw.githubusercontent.com' && url.pathname.startsWith('/PokeAPI/sprites/')) {
+    /* saved copy first; otherwise fetch and keep it. A failed fetch makes the page draw its mascot instead. */
+    e.respondWith(caches.open(SPRITES).then(c => c.match(req.url).then(hit => hit || fetch(req).then(r => {
+      if (r.ok) c.put(req.url, r.clone());
+      return r;
+    }))));
+    return;
+  }
+  if (url.origin !== location.origin) return;
   /* page itself: try the network first so updates arrive, fall back to the saved copy when offline */
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('./', copy)); return r; })

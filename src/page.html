@@ -80,6 +80,10 @@ main { padding-block: 12px calc(96px + env(safe-area-inset-bottom, 0px)); displa
 .tools { position: sticky; top: calc(var(--safe-t) + var(--bar-h)); z-index: 5; background: var(--bg); margin: -12px 0 -4px; padding: 12px 0 8px; display: flex; flex-direction: column; gap: 8px; }
 .search { width: 100%; min-width: 0; background: var(--panel); border: 3px solid var(--ink); padding: 8px 10px; font-size: 22px; box-shadow: 4px 4px 0 var(--ink); -webkit-appearance: none; appearance: none; }
 .search::placeholder { color: var(--mute); }
+.search::-webkit-search-cancel-button { display: none; }
+.searchwrap { position: relative; }
+.searchwrap .search { padding-right: 46px; }
+#q-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: none; border: 0; font-size: 24px; color: var(--mute); }
 .seg { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .chip { background: var(--panel); border: 3px solid var(--ink); padding: 4px 8px; font-size: 20px; min-height: 36px; white-space: nowrap; }
 .chip[aria-pressed="true"], .chip[aria-expanded="true"] { background: var(--ink); color: var(--panel); }
@@ -93,9 +97,9 @@ button.ty { padding: 9px 7px 8px; }
 button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(--ink); }
 
 .list { display: flex; flex-direction: column; gap: 8px; list-style: none; margin: 0; padding: 0; }
-.row { width: 100%; text-align: left; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; background: var(--panel); border: 3px solid var(--ink); padding: 6px 8px 6px 6px; box-shadow: 3px 3px 0 var(--ink); }
+.row { width: 100%; text-align: left; display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; background: var(--panel); border: 3px solid var(--ink); padding: 6px 8px 6px 6px; box-shadow: 3px 3px 0 var(--ink); }
 .row:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-.tile { width: 46px; height: 46px; border: 3px solid #1a2030; grid-row: span 2; image-rendering: pixelated; image-rendering: crisp-edges; max-width: none; display: block; }
+.tile { width: 70px; height: 70px; border: 3px solid #1a2030; grid-row: span 2; image-rendering: pixelated; image-rendering: crisp-edges; max-width: none; display: block; }
 .row .nm { font-size: 24px; line-height: 1; overflow-wrap: anywhere; }
 .row .no { font-family: var(--px); font-size: 8px; color: var(--mute); margin-right: 6px; }
 .row .tys { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -117,8 +121,10 @@ button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(
 .dnav .grow { margin-right: auto; }
 .flat { box-shadow: none; background: var(--panel-2); }
 .wide { width: 100%; margin-top: 10px; }
-.hero { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 12px; align-items: center; }
-.hero .tile { width: 86px; height: 86px; grid-row: auto; }
+.hero { display: grid; grid-template-columns: 102px minmax(0, 1fr); gap: 12px; align-items: center; }
+.hero .tile { width: 102px; height: 102px; grid-row: auto; }
+.tile[data-fb] { padding: 2px; }
+.hero .tile[data-fb] { padding: 8px; }
 .hero .no { font-family: var(--px); font-size: 8px; color: var(--mute); line-height: 1.7; }
 .hero h2 { font-family: var(--tx); font-size: 38px; font-weight: normal; margin: 0; line-height: .95; overflow-wrap: anywhere; }
 .hero .ge { color: var(--mute); font-size: 19px; margin-bottom: 5px; }
@@ -138,7 +144,7 @@ button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(
 .edge:first-child { border-top: 0; padding-top: 0; }
 .edge .pair { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .mon { background: var(--panel-2); border: 2px solid var(--ink); padding: 2px 8px 2px 2px; font-size: 21px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; text-align: left; }
-.mon img { width: 30px; height: 30px; flex: none; image-rendering: pixelated; image-rendering: crisp-edges; background: #e9eef2; }
+.mon img { width: 32px; height: 32px; flex: none; image-rendering: pixelated; image-rendering: crisp-edges; background: #e9eef2; }
 .mon.me { background: var(--ink); color: var(--panel); }
 .edge .how { color: var(--mute); font-size: 19px; }
 
@@ -222,7 +228,10 @@ table.mx { border-collapse: collapse; font-family: var(--px); font-size: 7px; }
 <div class="wrap">
   <main id="view-list">
     <div class="tools">
-      <input class="search" id="q" type="search" placeholder="Name, number, type, “lv 17”…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search Pokémon by name, number, type, ability or evolution level">
+      <div class="searchwrap">
+        <input class="search" id="q" type="search" placeholder="Name, number, type, “lv 17”…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search Pokémon by name, number, type, ability or evolution level">
+        <button id="q-clear" aria-label="Clear search" hidden>✕</button>
+      </div>
       <div class="seg">
         <button class="chip" id="dex-unova" aria-pressed="true">Unova</button>
         <button class="chip" id="dex-nat" aria-pressed="false">All 649</button>
@@ -298,7 +307,21 @@ const saveCaught = () => store('caught', caught);
 const state = { dex: 'unova', q: '', type: -1, onlyNew: false, atk: 9, def: [11], allLocs: false, allTms: false };
 
 /*SPRITES*/
-const tile = m => `<img class="tile" src="${sprite(m)}" style="background:${mix(COL[m.t[0]], 255, .68)}" alt="">`;
+/* Pictures are the Black/White sprites, loaded from the PokeAPI sprite host and never copied into this app.
+   An empty SPRITE_URL (the claude.ai build, where outside images are blocked) uses the drawn mascots only. */
+const SPRITE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/';
+const pic = (m, attrs = '') => SPRITE_URL
+  ? `<img ${attrs} src="${SPRITE_URL}${m.i}.png" data-mon="${m.i}" crossorigin="anonymous" loading="lazy" alt="">`
+  : `<img ${attrs} src="${sprite(m)}" data-fb="1" alt="">`;
+const tile = m => pic(m, `class="tile" style="background:${mix(COL[m.t[0]], 255, .68)}"`);
+/* a sprite that fails to load (offline and never seen, or the host is down) is replaced by the drawn mascot */
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (img.tagName !== 'IMG' || !img.dataset.mon || img.dataset.fb) return;
+  img.dataset.fb = '1';
+  img.removeAttribute('crossorigin');
+  img.src = sprite(byId.get(+img.dataset.mon));
+}, true);
 const badge = (t, tag = 'span', extra = '') =>
   `<${tag} class="ty${WHITE.has(t) ? ' w' : ''}" style="background:${COL[t]}"${extra}>${T[t]}</${tag}>`;
 const num = m => state.dex === 'unova' && m.u !== undefined ? pad(m.u) : pad(m.i);
@@ -363,7 +386,7 @@ function atkBlock(t) {
   return effRows(g);
 }
 
-const monBtn = (m, me) => `<button class="mon${m.i === me ? ' me' : ''}" data-id="${m.i}"><img src="${sprite(m)}" alt="">${esc(m.n)}${caught.has(m.i) ? ' <span class="got">✔</span>' : ''}</button>`;
+const monBtn = (m, me) => `<button class="mon${m.i === me ? ' me' : ''}" data-id="${m.i}">${pic(m)}${esc(m.n)}${caught.has(m.i) ? ' <span class="got">✔</span>' : ''}</button>`;
 const lvText = (lo, hi) => lo === hi ? 'Lv ' + lo : `Lv ${lo}–${hi}`;
 const rateText = (r0, r1) => r1 ? `<b>${r0 === r1 ? r1 : r0 + '–' + r1}%</b>` : '';
 const seasonText = mask => mask !== 15 ? SEASON.filter((_, i) => mask >> i & 1).join(', ') + ' only' : '';
@@ -604,7 +627,7 @@ function renderMore() {
     <section class="box"><h2><span class="ico">▶</span>About the data</h2>
       <p class="note">Everything follows Generation V rules as in Pokémon White: 17 types with no Fairy, Gen V base stats, abilities, move power and evolution methods.</p>
       <p class="note">Game data comes from PokeAPI. Boss teams and the White Forest list come from Pokémon Database. Swarms and Dream World encounters are not included, and moves use their current English names.</p>
-      <p class="note">The pixel pictures are original mascots drawn from each Pokémon's body shape, colour and type. They are not the game's sprites; use “Sprites ↗” on a Pokémon's page to see those.</p></section>`;
+      <p class="note">${SPRITE_URL ? 'Pokémon pictures are the Black/White sprites, loaded from the PokeAPI sprite collection when you view them and kept on this device for offline use. They are © The Pokémon Company. When a picture cannot load, a simple drawn mascot is shown instead.' : 'The pixel pictures are original mascots drawn from each Pokémon\'s body shape, colour and type. They are not the game\'s sprites; use “Sprites ↗” on a Pokémon\'s page to see those.'}</p></section>`;
   optMsg = '';
 }
 
@@ -664,7 +687,9 @@ function syncFilters() {
 const showTypes = on => { $('typebar').hidden = !on; $('type-toggle').setAttribute('aria-expanded', on); };
 try { if (localStorage.getItem('dex') === 'nat') state.dex = 'nat'; } catch (e) {}
 
-$('q').addEventListener('input', e => { state.q = e.target.value; renderList(); });
+const setQuery = q => { state.q = q; $('q-clear').hidden = !q; renderList(); };
+$('q').addEventListener('input', e => setQuery(e.target.value));
+$('q-clear').onclick = () => { $('q').value = ''; setQuery(''); $('q').focus(); };
 $('dex-unova').onclick = () => { state.dex = 'unova'; syncFilters(); };
 $('dex-nat').onclick = () => { state.dex = 'nat'; syncFilters(); };
 $('only-new').onclick = () => { state.onlyNew = !state.onlyNew; syncFilters(); };

@@ -14,10 +14,11 @@ Là một PWA tĩnh, chạy trên GitHub Pages: https://despahaha.github.io/poke
 | Đường dẫn | Vai trò |
 |---|---|
 | `src/page.html` | Toàn bộ giao diện và logic (HTML, CSS, JS trong một file). **Sửa ở đây.** |
-| `src/sprites.js` | Bộ vẽ hình pixel minh họa, được chèn vào chỗ `/*SPRITES*/` |
+| `src/sprites.js` | Bộ vẽ linh vật pixel dự phòng (dùng khi hình thật không tải được), chèn vào chỗ `/*SPRITES*/` |
 | `src/build.py` | Đọc CSV của PokeAPI, tính dữ liệu Gen V, chèn vào `/*DATA*/`, tạo `index.html`, `manifest.webmanifest`, `sw.js` |
 | `src/fetch_data.sh` | Tải CSV về `src/data/` (thư mục này không commit) |
 | `src/make_icons.js` | Vẽ lại `icons/*.png` (cần Playwright) |
+| `tests/app.test.js` | Bộ kiểm tra tự động chạy trên bản đã dựng |
 | `index.html`, `sw.js`, `manifest.webmanifest` | **File sinh ra, không sửa tay.** Mỗi lần dựng sẽ bị ghi đè |
 | `fonts/`, `fonts.css`, `icons/` | Tài nguyên tĩnh, commit sẵn |
 | `pokedex-pwa/index.html` | Trang chuyển hướng từ địa chỉ cũ. Giữ nguyên |
@@ -32,13 +33,15 @@ sh src/fetch_data.sh
 python3 src/build.py
 ```
 
-Sau khi dựng, luôn kiểm tra trước khi đẩy lên:
+Sau khi dựng, chạy bộ kiểm tra trước khi đẩy lên (cần Playwright và mạng tới `raw.githubusercontent.com`):
 
-1. Chạy máy chủ tĩnh ở thư mục gốc (`python3 -m http.server`) và mở bằng Playwright ở khung iPhone (390×844), cả giao diện sáng lẫn tối.
-2. Không có lỗi JS trong console; `document.documentElement.scrollWidth - innerWidth` phải bằng 0 (không cuộn ngang).
-3. Service worker ở trạng thái `activated`; ngắt mạng, tải lại, danh sách vẫn hiện.
-4. Mở thử vài Pokémon có trường hợp đặc biệt: Eevee (nhiều nhánh), Snivy (được tặng), Whimsicott (chỉ có ở Black), Mewtwo (không có trong White), Ralts (White Forest).
-5. Đi qua cả năm tab (Dex, Types, Places, Bosses, Team) và trang Options; thử cỡ chữ Largest xem có tràn ngang không.
+```bash
+node tests/app.test.js
+```
+
+Bộ này mở ứng dụng ở khung iPhone và kiểm tra: không lỗi JS, không cuộn ngang, hình thật hiện ở danh sách và trang chi tiết, linh vật thay thế khi máy chủ hình không tới được, hình đã xem vẫn hiện khi offline, nút xóa ô tìm kiếm, và năm tab cùng trang Options ở cỡ chữ lớn nhất.
+
+Khi thêm tính năng: viết bài kiểm tra trong `tests/app.test.js` trước, chạy cho thấy nó thất bại, rồi mới sửa `src/`. Với thay đổi về hình thức, chụp thêm ảnh ở cả giao diện sáng và tối để xem bằng mắt.
 
 ## Xuất bản
 
@@ -52,7 +55,7 @@ GitHub Pages phục vụ nhánh `main`, thư mục gốc. Đẩy lên `main` là
 - **Luật Gen V, không phải bản mới nhất.** Chưa có hệ Fairy (17 hệ); Steel kháng Ghost và Dark; chỉ số gốc và hệ lấy theo Gen V. `build.py` áp các bảng `*_past` của PokeAPI để làm việc này. Khi thêm dữ liệu mới, luôn kiểm tra nó có khác giữa các thế hệ không.
 - **Chiêu thức theo Black/White.** Sức mạnh, độ chính xác, PP và hệ của chiêu lấy theo Gen V qua `move_changelog` (ví dụ Flamethrower 95, Tackle 50, Charm hệ Normal). Tên chiêu dùng tên tiếng Anh hiện tại.
 - **Tiến hóa theo Black/White.** Ví dụ Magneton tiến hóa ở Chargestone Cave, Feebas bằng trao đổi kèm Prism Scale, độ thân thiết cần 220.
-- **Không dùng hình gốc của game.** Sprite chính thức thuộc bản quyền Nintendo/Game Freak. Hình trong ứng dụng là linh vật tự vẽ theo dáng cơ thể, màu và hệ (`sprites.js`); trang chi tiết có nút mở hình gốc trên pokemondb.net. Đừng nhúng hay sao chép sprite chính thức, kể cả từ nguồn "miễn phí".
+- **Hình Pokémon: hiển thị từ máy chủ PokeAPI, không chép vào repo.** Bản PWA tải sprite Black/White trực tiếp từ `raw.githubusercontent.com/PokeAPI/sprites` (chủ repo chọn bộ này ngày 2026-11-11). Hình thuộc bản quyền The Pokémon Company, nên **không commit file hình, không nhúng dạng data URI**. Khi không tải được (offline và chưa từng xem, máy chủ lỗi) trang tự dùng linh vật tự vẽ trong `sprites.js`. Service worker lưu hình đã xem vào bộ nhớ riêng `pokedex-sprites-v1` trên máy người dùng. Bản trên claude.ai bị chặn ảnh ngoài nên `build.py` để `SPRITE_URL` rỗng và chỉ dùng linh vật.
 - **Phong cách pixel.** Press Start 2P cho số, nhãn hệ và tiêu đề ngắn; VT323 cho chữ đọc. Viền cứng, đổ bóng lệch, không bo góc.
 - **Không chép lời mô tả Pokédex của game** (flavor text): đó là văn bản có bản quyền. Trang chi tiết chỉ hiện số liệu: loài, chiều cao, cân nặng, năng lực, tỉ lệ bắt, nhóm trứng…
 - **Dữ liệu ngoài PokeAPI** (đội hình trùm, danh sách White Forest) lấy từ pokemondb.net và ghi trực tiếp trong `build.py`. Bulbapedia không truy cập được từ phiên đám mây.
@@ -63,7 +66,7 @@ GitHub Pages phục vụ nhánh `main`, thư mục gốc. Đẩy lên `main` là
 
 - Nơi bắt chưa gồm các đợt **swarm** và Dream World (chưa có nguồn dữ liệu), nên một số Pokémon vẫn bị ghi là không bắt được. White Forest đã có nhưng chỉ ở mức danh sách loài, không có tỉ lệ.
 - Chưa có chiêu học qua trứng (egg moves) và Move Tutor.
-- Hình minh họa không phải chân dung từng con; các con cùng dáng, màu, hệ và giai đoạn trông gần giống nhau.
+- Ứng dụng phụ thuộc máy chủ hình của PokeAPI; nếu kho đó đổi đường dẫn thì toàn bộ hình quay về linh vật cho tới khi sửa `SPRITE_URL` trong `src/page.html`.
 - Dạng thay thế (Rotom, Deoxys, Basculin sọc đỏ/xanh…) chưa được tách riêng.
 
 ## Kế hoạch
