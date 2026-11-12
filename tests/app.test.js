@@ -97,6 +97,17 @@ test('clear button empties the search and brings the full list back', async brow
   await ctx.close();
 });
 
+test('detail page puts Attacking and Defending before Evolution', async browser => {
+  const { ctx, page } = await open(browser);
+  await page.click('#list .row[data-id="495"]');
+  await page.waitForSelector('#view-detail .hero');
+  const titles = await page.locator('#view-detail section.box[id] > h2').allTextContents();
+  assert.deepStrictEqual(titles.map(t => t.replace('▶', '').trim()).slice(0, 3), ['Attacking', 'Defending', 'Evolution']);
+  const chips = await page.locator('#view-detail .jump .chip').allTextContents();
+  assert.deepStrictEqual(chips, ['Types', 'Evolve', 'Catch', 'Moves', 'Data']);
+  await ctx.close();
+});
+
 test('every tab and the options page render at the largest text size without sideways scrolling', async browser => {
   const { ctx, page } = await open(browser);
   await page.click('#open-more');
@@ -121,7 +132,7 @@ test('every tab and the options page render at the largest text size without sid
     try {
       await Promise.race([fn(browser), new Promise((_, no) => setTimeout(() => no(new Error('timed out after 30s')), 30000))]);
       console.log('PASS  ' + name);
-    } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + String(e.message).split('\n')[0]); }
+    } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + String(e.message).split('\n').slice(0, 12).join('\n      ')); }
   }
   await browser.close();
   server.kill();

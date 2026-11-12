@@ -486,12 +486,22 @@ function renderDetail(m) {
       </div>
     </section>
     <nav class="jump" aria-label="Jump to section">
+      <button class="chip" data-go="s-atk">Types</button>
       <button class="chip" data-go="s-evo">Evolve</button>
       <button class="chip" data-go="s-loc">Catch</button>
       <button class="chip" data-go="s-mov">Moves</button>
-      <button class="chip" data-go="s-atk">Types</button>
       <button class="chip" data-go="s-data">Data</button>
     </nav>
+    <section class="box" id="s-atk">
+      <h2><span class="ico">▶</span>Attacking</h2>
+      <p class="note">What ${esc(m.n)}'s own-type moves hit hard. Own-type moves also get ×1.5 damage (STAB).</p>
+      ${m.t.map(t => `<div class="sub">${badge(t)} moves</div><div class="eff">${atkBlock(t)}</div>`).join('')}
+    </section>
+    <section class="box" id="s-def">
+      <h2><span class="ico">▶</span>Defending</h2>
+      <p class="note">Damage ${esc(m.n)} takes, by the type of the incoming move.</p>
+      <div class="eff">${defBlock(m.t)}</div>
+    </section>
     <section class="box" id="s-evo">
       <h2><span class="ico">▶</span>Evolution</h2>
       ${next}
@@ -507,16 +517,6 @@ function renderDetail(m) {
     <section class="box" id="s-mov">
       <h2><span class="ico">▶</span>Moves in Black/White</h2>
       ${moveBlock(m)}
-    </section>
-    <section class="box" id="s-atk">
-      <h2><span class="ico">▶</span>Attacking</h2>
-      <p class="note">What ${esc(m.n)}'s own-type moves hit hard. Own-type moves also get ×1.5 damage (STAB).</p>
-      ${m.t.map(t => `<div class="sub">${badge(t)} moves</div><div class="eff">${atkBlock(t)}</div>`).join('')}
-    </section>
-    <section class="box" id="s-def">
-      <h2><span class="ico">▶</span>Defending</h2>
-      <p class="note">Damage ${esc(m.n)} takes, by the type of the incoming move.</p>
-      <div class="eff">${defBlock(m.t)}</div>
     </section>
     <section class="box" id="s-data">
       <h2><span class="ico">▶</span>Pokédex data</h2>
