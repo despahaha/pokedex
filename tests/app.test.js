@@ -142,6 +142,20 @@ test('turning the phone sideways opens the dock and turning it back returns', as
   await ctx.close();
 });
 
+test('options page lets you copy the widget script and your team code', async browser => {
+  const { ctx, page } = await withTeam(browser, [495, 498]);
+  await ctx.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.click('#open-more');
+  await page.click('#widget-copy');
+  const script = await page.evaluate(() => navigator.clipboard.readText());
+  assert.ok(script.includes('new ListWidget()') && script.includes('widget.json'), 'clipboard should hold the Scriptable script');
+  await page.click('#team-copy');
+  const code = await page.evaluate(() => navigator.clipboard.readText());
+  assert.ok(code.startsWith('PDX1.'), 'clipboard should hold the team code, got ' + code.slice(0, 20));
+  assert.deepStrictEqual(JSON.parse(Buffer.from(code.slice(5), 'base64').toString()).t, [495, 498]);
+  await ctx.close();
+});
+
 test('every tab and the options page render at the largest text size without sideways scrolling', async browser => {
   const { ctx, page } = await open(browser);
   await page.click('#open-more');

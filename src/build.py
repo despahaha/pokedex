@@ -299,8 +299,23 @@ data = {'types': TNAME, 'chart': chart, 'mons': out, 'locs': locs, 'meths': METH
 blob = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
 open(D + 'data.json', 'w', encoding='utf-8').write(blob)
 
+# ---- data for the Scriptable home-screen widget (widget/pokedex-widget.js fetches this file) ----
+kids_of = defaultdict(list)
+for e in out:
+    if 'f' in e: kids_of[e['f']].append(e)
+def next_short(e):
+    k = kids_of[e['i']]
+    if not k: return ''
+    return ' / '.join(c['m'][0][0] for c in k) if len(k) <= 2 else '%d paths' % len(k)
+wmons = [None] * (MAXID + 1)
+for e in out: wmons[e['i']] = [e['n'], e['t'], next_short(e)]
+json.dump({'v': 1, 'types': TNAME, 'chart': chart, 'mons': wmons}, open(ROOT + 'widget.json', 'w', encoding='utf-8'),
+          ensure_ascii=False, separators=(',', ':'))
+widget_js = open(ROOT + 'widget/pokedex-widget.js', encoding='utf-8').read()
+
 html = open(SRC + 'page.html', encoding='utf-8').read()
 html = html.replace('/*SPRITES*/', open(SRC + 'sprites.js', encoding='utf-8').read()).replace('/*DATA*/', blob)
+html = html.replace('/*WIDGET*/', json.dumps(widget_js, ensure_ascii=False).replace('</', '<\\/'))
 # the claude.ai copy cannot load outside images, so it keeps the drawn mascots
 artifact, n = re.subn(r"const SPRITE_URL = '[^']*';", "const SPRITE_URL = '';", html)
 assert n == 1
@@ -354,7 +369,7 @@ manifest = {
 }
 json.dump(manifest, open(ROOT + 'manifest.webmanifest', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 fonts = sorted('fonts/' + f for f in os.listdir(ROOT + 'fonts'))
-assets = ['./', 'index.html', 'fonts.css', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'] + fonts
+assets = ['./', 'index.html', 'fonts.css', 'manifest.webmanifest', 'widget.json', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'] + fonts
 ver = hashlib.sha1((doc + open(ROOT + 'fonts.css').read()).encode()).hexdigest()[:10]
 SW = """/* Offline cache. The version changes whenever the page changes, so an update replaces the old copy. */
 const CACHE = 'pokedex-%s';

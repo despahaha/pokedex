@@ -202,6 +202,8 @@ button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(
 .meter { height: 16px; background: var(--panel-2); border: 2px solid var(--ink); margin: 4px 0 10px; }
 .meter i { display: block; height: 100%; background: var(--good); }
 .status { min-height: 22px; margin: 8px 0 0; }
+.steps { margin: 0 0 4px; padding-left: 26px; display: flex; flex-direction: column; gap: 6px; }
+.steps b { font-weight: normal; background: var(--panel-2); padding: 0 4px; }
 
 .picker { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
 .scroll { overflow-x: auto; }
@@ -617,6 +619,7 @@ const ZOOMS = [['Small', .9], ['Normal', 1], ['Large', 1.15], ['Largest', 1.3]];
 let zoom = 1;
 try { zoom = +localStorage.getItem('zoom') || 1; } catch (e) {}
 const applyZoom = () => { document.body.style.zoom = zoom === 1 ? '' : zoom; };
+const WIDGET_SCRIPT = /*WIDGET*/;
 const makeCode = () => 'PDX1.' + btoa(JSON.stringify({ t: [...party], c: [...caught] }));
 function readCode(text) {
   const d = JSON.parse(atob(text.trim().replace(/^PDX1\./, '')));
@@ -641,6 +644,19 @@ function renderMore() {
       <textarea class="code" id="code-in" placeholder="Paste a backup code here" aria-label="Backup code to restore"></textarea>
       <button class="btn flat wide" id="code-load">Restore (replaces current team and caught list)</button>
       <p class="status" id="opt-msg" role="status">${esc(optMsg)}</p></section>
+    <section class="box"><h2><span class="ico">▶</span>Home screen widget</h2>
+      <p class="note">Shows your team on the Home Screen through the free Scriptable app. A web app cannot make a widget on its own.</p>
+      <ol class="steps">
+        <li>Install <b>Scriptable</b> from the App Store.</li>
+        <li>Tap “Copy widget script” below. In Scriptable tap +, paste, and name the script Pokédex.</li>
+        <li>Add a Scriptable widget to the Home Screen. Long-press it, tap Edit Widget, and choose Script: Pokédex.</li>
+        <li>In Parameter, paste your team code (second button) or type names: Pignite, Pidove.</li>
+      </ol>
+      <button class="btn flat wide" id="widget-copy">Copy widget script</button>
+      <button class="btn flat wide" id="team-copy">Copy my team code</button>
+      <textarea class="code" id="widget-out" readonly aria-label="Text to copy" hidden></textarea>
+      <p class="status" id="widget-msg" role="status"></p>
+      <p class="note">The widget keeps its own copy of the team. After you change your team here, copy the team code again and replace the Parameter.</p></section>
     <section class="box"><h2><span class="ico">▶</span>About the data</h2>
       <p class="note">Everything follows Generation V rules as in Pokémon White: 17 types with no Fairy, Gen V base stats, abilities, move power and evolution methods.</p>
       <p class="note">Game data comes from PokeAPI. Boss teams and the White Forest list come from Pokémon Database. Swarms and Dream World encounters are not included, and moves use their current English names.</p>
@@ -776,6 +792,14 @@ $('view-detail').addEventListener('click', e => {
 $('view-more').addEventListener('click', e => {
   const z = e.target.closest('[data-zoom]');
   if (z) { zoom = +z.dataset.zoom; store('zoom', String(zoom)); applyZoom(); return renderMore(); }
+  const copyOut = (text, what) => {
+    const box = $('widget-out'), done = t => { $('widget-msg').textContent = t; };
+    const fallback = () => { box.hidden = false; box.value = text; box.focus(); box.select(); done('Could not copy automatically. The text is selected below: use Copy from the menu.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done(what + ' copied.'), fallback);
+    else fallback();
+  };
+  if (e.target.closest('#widget-copy')) copyOut(WIDGET_SCRIPT, 'Widget script');
+  if (e.target.closest('#team-copy')) copyOut(makeCode(), 'Team code');
   if (e.target.closest('#code-copy')) {
     const box = $('code-out'), done = t => { $('opt-msg').textContent = t; };
     const fallback = () => { box.focus(); box.select(); done('Code selected. Use Copy from the menu.'); };

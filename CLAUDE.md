@@ -19,6 +19,9 @@ Là một PWA tĩnh, chạy trên GitHub Pages: https://despahaha.github.io/poke
 | `src/fetch_data.sh` | Tải CSV về `src/data/` (thư mục này không commit) |
 | `src/make_icons.js` | Vẽ lại `icons/*.png` (cần Playwright) |
 | `tests/app.test.js` | Bộ kiểm tra tự động chạy trên bản đã dựng |
+| `tests/widget.test.js` | Kiểm tra logic của script widget với API Scriptable giả lập |
+| `widget/pokedex-widget.js` | Script widget cho ứng dụng Scriptable |
+| `widget.json` | Dữ liệu rút gọn cho widget. **File sinh ra, không sửa tay** |
 | `index.html`, `sw.js`, `manifest.webmanifest` | **File sinh ra, không sửa tay.** Mỗi lần dựng sẽ bị ghi đè |
 | `fonts/`, `fonts.css`, `icons/` | Tài nguyên tĩnh, commit sẵn |
 | `pokedex-pwa/index.html` | Trang chuyển hướng từ địa chỉ cũ. Giữ nguyên |
@@ -37,6 +40,10 @@ Sau khi dựng, chạy bộ kiểm tra trước khi đẩy lên (cần Playwrigh
 
 ```bash
 node tests/app.test.js
+```
+
+```bash
+node tests/widget.test.js
 ```
 
 Bộ này mở ứng dụng ở khung iPhone và kiểm tra: không lỗi JS, không cuộn ngang, hình thật hiện ở danh sách và trang chi tiết, linh vật thay thế khi máy chủ hình không tới được, hình đã xem vẫn hiện khi offline, nút xóa ô tìm kiếm, và năm tab cùng trang Options ở cỡ chữ lớn nhất.
@@ -63,6 +70,8 @@ GitHub Pages phục vụ nhánh `main`, thư mục gốc. Đẩy lên `main` là
 - Đội, danh sách đã bắt và cỡ chữ lưu bằng `localStorage` trên máy người dùng, không có máy chủ. Trang Options có mã sao lưu (`PDX1.…`) để chép tay sang máy khác.
 
 - **Chế độ Dock** (`#dock`): khi điện thoại xoay ngang (hoặc bấm nút trong tab Team), ứng dụng hiện đội dạng thẻ lớn với hệ đánh mạnh (HIT) và hệ phải sợ (FEAR), ẩn thanh trên và tab dưới, giữ màn hình không tắt. Đây là cách thay cho widget iOS, vì PWA không tạo được widget thật.
+
+- **Widget màn hình chính** chạy qua ứng dụng Scriptable (iOS), vì PWA không tạo được widget. Script nằm ở `widget/pokedex-widget.js` (sửa trực tiếp file này); nó tải `widget.json` do `build.py` sinh ra và hình từ kho PokeAPI. `build.py` cũng nhúng nội dung script vào trang để nút "Copy widget script" ở Options dùng. Script **chưa được chạy trên Scriptable thật**: `tests/widget.test.js` chỉ chạy nó với một bản giả lập API, nên lỗi gọi sai API của Scriptable phải nhờ chủ repo thử trên máy.
 
 ## Hạn chế đã biết
 

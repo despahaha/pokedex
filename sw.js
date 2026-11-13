@@ -1,6 +1,6 @@
 /* Offline cache. The version changes whenever the page changes, so an update replaces the old copy. */
-const CACHE = 'pokedex-b0f1949796';
-const ASSETS = ["./", "index.html", "fonts.css", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "fonts/PressStart2P-latin-ext.woff2", "fonts/PressStart2P-latin.woff2", "fonts/VT323-latin-ext.woff2", "fonts/VT323-latin.woff2", "fonts/VT323-vietnamese.woff2"];
+const CACHE = 'pokedex-caf3d022d8';
+const ASSETS = ["./", "index.html", "fonts.css", "manifest.webmanifest", "widget.json", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "fonts/PressStart2P-latin-ext.woff2", "fonts/PressStart2P-latin.woff2", "fonts/VT323-latin-ext.woff2", "fonts/VT323-latin.woff2", "fonts/VT323-vietnamese.woff2"];
 /* Pokémon sprites are kept as you view them, in their own cache that survives app updates. */
 const SPRITES = 'pokedex-sprites-v1';
 self.addEventListener('install', e => {
