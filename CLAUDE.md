@@ -62,6 +62,8 @@ GitHub Pages phục vụ nhánh `main`, thư mục gốc. Đẩy lên `main` là
 - **Một file, không framework, không phụ thuộc mạng lúc chạy.** Dữ liệu nằm sẵn trong `index.html`; font tự lưu trữ.
 - Đội, danh sách đã bắt và cỡ chữ lưu bằng `localStorage` trên máy người dùng, không có máy chủ. Trang Options có mã sao lưu (`PDX1.…`) để chép tay sang máy khác.
 
+- **Chế độ Dock** (`#dock`): khi điện thoại xoay ngang (hoặc bấm nút trong tab Team), ứng dụng hiện đội dạng thẻ lớn với hệ đánh mạnh (HIT) và hệ phải sợ (FEAR), ẩn thanh trên và tab dưới, giữ màn hình không tắt. Đây là cách thay cho widget iOS, vì PWA không tạo được widget thật.
+
 ## Hạn chế đã biết
 
 - Nơi bắt chưa gồm các đợt **swarm** và Dream World (chưa có nguồn dữ liệu), nên một số Pokémon vẫn bị ghi là không bắt được. White Forest đã có nhưng chỉ ở mức danh sách loài, không có tỉ lệ.

@@ -344,7 +344,7 @@ open(ROOT + 'index.html', 'w', encoding='utf-8').write(doc)
 manifest = {
     'name': 'Pokédex White', 'short_name': 'Pokédex', 'lang': 'en',
     'description': 'Pokémon White companion: evolutions, locations, moves, type matchups and bosses for Generation V.',
-    'start_url': './', 'scope': './', 'display': 'standalone', 'orientation': 'portrait',
+    'start_url': './', 'scope': './', 'display': 'standalone', 'orientation': 'any',
     'background_color': '#dfe5ea', 'theme_color': '#d63a2c',
     'icons': [
         {'src': 'icons/icon-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},

@@ -237,6 +237,21 @@ table.mx { border-collapse: collapse; font-family: var(--px); font-size: 7px; }
 .mx thead th span { display: inline-block; writing-mode: vertical-rl; }
 .mx tbody th { min-width: 30px; position: sticky; left: 0; }
 .mx td.g { background: var(--good); color: var(--on-mark); } .mx td.b { background: var(--bad); color: var(--on-mark); } .mx td.z { background: var(--zero); color: var(--on-mark); }
+/* dock: a sideways, glanceable view of the team for when the phone is charging on its side */
+body.dock .top, body.dock .tabs { display: none; }
+body.dock .wrap { max-width: none; }
+body.dock main { padding-block: 10px; gap: 10px; }
+.dhead { display: flex; align-items: center; gap: 10px; }
+.dhead h2 { font-family: var(--px); font-size: 12px; margin: 0; }
+.dhead .clock { margin-left: auto; font-family: var(--px); font-size: 12px; color: var(--mute); }
+.dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.dcard { background: var(--panel); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 6px 8px; text-align: left; display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 4px 10px; align-items: center; }
+.dcard .nm { font-size: 26px; line-height: 1; overflow-wrap: anywhere; }
+.dcard .tys { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.dcard .ln { grid-column: 1 / -1; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 6px; align-items: start; }
+.dcard .ln .tys { margin: 0; }
+.dcard .mult { font-size: 7px; padding: 5px 0 4px; }
+.dcard .nx { color: var(--mute); font-size: 18px; }
 @media (prefers-reduced-motion: reduce) { .row:active, .btn:active { transform: none; } }
 </style>
 
@@ -272,6 +287,7 @@ table.mx { border-collapse: collapse; font-family: var(--px); font-size: 7px; }
   <main id="view-bosses" hidden></main>
   <main id="view-team" hidden></main>
   <main id="view-more" hidden></main>
+  <main id="view-dock" hidden></main>
   <main id="view-types" hidden>
     <section class="box">
       <h2><span class="ico">▶</span>My move is type…</h2>
@@ -702,7 +718,8 @@ function renderTeam() {
   const weak = T.map((_, a) => [a, team.filter(m => defMult(m.t)[a] >= 2)]).filter(x => x[1].length >= Math.min(2, team.length)).sort((x, y) => y[1].length - x[1].length);
   $('view-team').innerHTML = `
     <section class="box"><h2><span class="ico">▶</span>My team · ${team.length}</h2>
-      <ul class="list">${team.map(rowHTML).join('')}</ul></section>
+      <ul class="list">${team.map(rowHTML).join('')}</ul>
+      <button class="btn flat wide" id="dock-go">Dock view · or turn the phone sideways</button></section>
     <section class="box"><h2><span class="ico">▶</span>Who to use against…</h2>
       <p class="note">Team members whose own-type moves hit that type for ×2.</p>
       <div class="cover">${cover.map((l, d) => `${badge(d)}<span class="who${l.length ? '' : ' no'}">${l.length ? l.map(m => esc(m.n)).join(', ') : 'nobody yet'}</span>`).join('')}</div></section>
@@ -764,7 +781,36 @@ function renderMatrix() {
 }
 
 /* ---- routing: '', pN, types, places, lN, bosses, team, more ---- */
-const VIEWS = ['list', 'detail', 'types', 'places', 'place', 'bosses', 'team', 'more'];
+/* ---- dock ---- */
+let wakeLock = null;
+async function keepAwake(on) {
+  try {
+    if (on && !wakeLock && navigator.wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); }
+    else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch (e) { wakeLock = null; }
+}
+const clockText = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+function renderDock() {
+  const team = [...party].map(i => byId.get(i)).filter(Boolean);
+  const card = m => {
+    const hits = T.map((_, d) => d).filter(d => m.t.some(a => C[a][d] === 200));
+    const dm = defMult(m.t), weak = T.map((_, a) => a).filter(a => dm[a] >= 2);
+    const k = kids.get(m.i);
+    const line = (cls, label, list) => `<div class="ln ${cls}"><span class="mult ${cls === 'hits' ? 'g' : 'b'}">${label}</span><span class="tys">${list.length ? list.map(t => badge(t)).join('') : '<span class="nx">none</span>'}</span></div>`;
+    return `<button class="dcard" data-id="${m.i}">${tile(m)}
+      <span><span class="nm">${esc(m.n)}</span><span class="tys">${m.t.map(t => badge(t)).join('')}</span>
+      <span class="nx">${k ? 'Evolves: ' + esc(k.map(c => c.m[0][0]).join(' / ')) : 'Final form'}</span></span>
+      ${line('hits', 'HIT', hits)}${line('weak', 'FEAR', weak)}</button>`;
+  };
+  $('view-dock').innerHTML = `
+    <div class="dhead"><button class="btn" id="dock-close">◀ Close</button><h2>TEAM DOCK</h2><span class="clock" id="dock-clock">${clockText()}</span></div>
+    ${team.length ? `<div class="dgrid">${team.map(card).join('')}</div>
+      <p class="note">HIT = types its own-type moves hit for ×2. FEAR = move types that hit it for ×2 or more. Tap a card for details.</p>`
+      : `<section class="box"><p class="note">Your team is empty. Open a Pokémon you are using and tap “☆ Team”, then come back here.</p></section>`}`;
+}
+setInterval(() => { const c = $('dock-clock'); if (c && currentView === 'dock') c.textContent = clockText(); }, 20000);
+
+const VIEWS = ['list', 'detail', 'types', 'places', 'place', 'bosses', 'team', 'more', 'dock'];
 const scrolls = {};
 let currentHash = '', currentView = 'list';
 function route() {
@@ -777,10 +823,12 @@ function route() {
   const root = view === 'detail' ? (/^l\d+$/.test(lastList) ? 'places' : lastList || 'dex') : view === 'place' ? 'places' : view === 'list' ? 'dex' : view;
   ['dex', 'types', 'places', 'bosses', 'team'].forEach(t => $('tab-' + t).setAttribute('aria-selected', t === root));
   $('open-more').setAttribute('aria-pressed', view === 'more');
+  document.body.classList.toggle('dock', view === 'dock');
+  keepAwake(view === 'dock');
   const cameBack = currentView === 'detail' || (currentView === 'place' && view === 'places');
   if (view === 'detail') { state.allLocs = state.allTms = false; renderDetail(byId.get(+pm[1])); }
   else if (view === 'place') renderPlace(+lm[1]);
-  else ({ list: renderList, types: renderTypes, places: renderPlaces, bosses: renderBosses, team: renderTeam, more: renderMore })[view]();
+  else ({ list: renderList, types: renderTypes, places: renderPlaces, bosses: renderBosses, team: renderTeam, more: renderMore, dock: renderDock })[view]();
   window.scrollTo(0, cameBack && view !== 'detail' ? scrolls[h] || 0 : 0);
   currentHash = h; currentView = view;
 }
@@ -818,7 +866,17 @@ $('typebar').onclick = e => { const b = e.target.closest('button'); if (!b) retu
 $('tab-dex').onclick = () => go('');
 ['types', 'places', 'bosses', 'team'].forEach(t => { $('tab-' + t).onclick = () => go(t); });
 $('open-more').onclick = () => go(currentView === 'more' ? '' : 'more');
-$('view-team').addEventListener('click', e => { if (e.target.closest('#team-go')) go(''); });
+$('view-team').addEventListener('click', e => { if (e.target.closest('#team-go')) go(''); if (e.target.closest('#dock-go')) go('dock'); });
+/* a phone turned sideways opens the dock; turning it upright goes back to where you were */
+let beforeDock = '';
+const sideways = matchMedia('(orientation: landscape) and (max-height: 500px)');
+const leaveDock = () => go(beforeDock === 'dock' ? '' : beforeDock);
+sideways.addEventListener('change', e => {
+  if (e.matches && location.hash !== '#dock') { beforeDock = location.hash.replace('#', ''); go('dock'); }
+  else if (!e.matches && location.hash === '#dock') leaveDock();
+});
+$('view-dock').addEventListener('click', e => { if (e.target.closest('#dock-close')) leaveDock(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && currentView === 'dock') keepAwake(true); });
 $('view-place').addEventListener('click', e => { if (e.target.closest('#back-places')) go('places'); });
 const smooth = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 $('view-detail').addEventListener('click', e => {

@@ -108,6 +108,40 @@ test('detail page puts Attacking and Defending before Evolution', async browser 
   await ctx.close();
 });
 
+const withTeam = async (browser, ids) => {
+  const { ctx, page } = await open(browser);
+  await page.evaluate(t => localStorage.setItem('party', JSON.stringify(t)), ids);
+  await page.reload();
+  await page.waitForSelector('#list .row');
+  return { ctx, page };
+};
+
+test('dock shows each team member with what it hits hard and what it is weak to', async browser => {
+  const { ctx, page } = await withTeam(browser, [495, 498]);
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.evaluate(() => { location.hash = 'dock'; });
+  await page.waitForSelector('#view-dock .dcard');
+  assert.strictEqual(await page.locator('#view-dock .dcard').count(), 2);
+  const snivy = page.locator('#view-dock .dcard').first();
+  assert.ok((await snivy.textContent()).includes('Snivy'));
+  assert.ok((await snivy.locator('.hits .ty').allTextContents()).includes('Water'), 'Grass moves hit Water hard');
+  assert.ok((await snivy.locator('.weak .ty').allTextContents()).includes('Fire'), 'Snivy is weak to Fire');
+  assert.ok(await page.locator('.tabs').isHidden(), 'tab bar is hidden in the dock');
+  assert.strictEqual(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0);
+  assert.deepStrictEqual(page.errors, []);
+  await ctx.close();
+});
+
+test('turning the phone sideways opens the dock and turning it back returns', async browser => {
+  const { ctx, page } = await withTeam(browser, [495]);
+  await page.click('#tab-types');
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.waitForFunction(() => location.hash === '#dock');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForFunction(() => location.hash === '#types');
+  await ctx.close();
+});
+
 test('every tab and the options page render at the largest text size without sideways scrolling', async browser => {
   const { ctx, page } = await open(browser);
   await page.click('#open-more');
