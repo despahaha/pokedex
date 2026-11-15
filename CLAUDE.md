@@ -13,7 +13,8 @@ Là một PWA tĩnh, chạy trên GitHub Pages: https://despahaha.github.io/poke
 
 | Đường dẫn | Vai trò |
 |---|---|
-| `src/page.html` | Toàn bộ giao diện và logic (HTML, CSS, JS trong một file). **Sửa ở đây.** |
+| `src/page.html` | Khung trang và toàn bộ logic (HTML, JS). **Sửa ở đây.** |
+| `src/style.css` | Toàn bộ kiểu dáng; bộ dựng chèn vào chỗ `/*STYLE*/` |
 | `src/sprites.js` | Bộ vẽ linh vật pixel dự phòng (dùng khi hình thật không tải được), chèn vào chỗ `/*SPRITES*/` |
 | `src/build.py` | Đọc CSV của PokeAPI, tính dữ liệu Gen V, chèn vào `/*DATA*/`, tạo `index.html`, `manifest.webmanifest`, `sw.js` |
 | `src/fetch_data.sh` | Tải CSV về `src/data/` (thư mục này không commit) |
@@ -63,7 +64,8 @@ GitHub Pages phục vụ nhánh `main`, thư mục gốc. Đẩy lên `main` là
 - **Chiêu thức theo Black/White.** Sức mạnh, độ chính xác, PP và hệ của chiêu lấy theo Gen V qua `move_changelog` (ví dụ Flamethrower 95, Tackle 50, Charm hệ Normal). Tên chiêu dùng tên tiếng Anh hiện tại.
 - **Tiến hóa theo Black/White.** Ví dụ Magneton tiến hóa ở Chargestone Cave, Feebas bằng trao đổi kèm Prism Scale, độ thân thiết cần 220.
 - **Hình Pokémon: hiển thị từ máy chủ PokeAPI, không chép vào repo.** Bản PWA tải sprite Black/White trực tiếp từ `raw.githubusercontent.com/PokeAPI/sprites` (chủ repo chọn bộ này ngày 2026-11-11). Hình thuộc bản quyền The Pokémon Company, nên **không commit file hình, không nhúng dạng data URI**. Khi không tải được (offline và chưa từng xem, máy chủ lỗi) trang tự dùng linh vật tự vẽ trong `sprites.js`. Service worker lưu hình đã xem vào bộ nhớ riêng `pokedex-sprites-v1` trên máy người dùng. Bản trên claude.ai bị chặn ảnh ngoài nên `build.py` để `SPRITE_URL` rỗng và chỉ dùng linh vật.
-- **Phong cách pixel.** Press Start 2P cho số, nhãn hệ và tiêu đề ngắn; VT323 cho chữ đọc. Viền cứng, đổ bóng lệch, không bo góc.
+- **Phong cách lai** (chủ repo chốt ngày 2026-11-15, thay cho phong cách pixel thuần): thẻ bo tròn, nền dịu, số liệu dùng phông bo tròn của hệ thống cho dễ đọc; phần pixel giữ ở tiêu đề POKéDEX, tên mục, nhãn hệ, số thứ tự và sprite. Mọi trạng thái "đang chọn" dùng xanh Bright Blue `#0096FF`. Thiết kế đầy đủ ở `docs/superpowers/specs/2026-11-15-hybrid-look-design.md`.
+- **Ô tìm kiếm nằm ở đáy**, phía trên năm tab, dùng được ở mọi tab; kết quả mở lên phía trên. Khi gõ, thanh được nâng lên theo chiều cao bàn phím (`visualViewport`). Phần xử lý bàn phím iOS **không kiểm tra được bằng Chromium**: mỗi lần sửa đoạn mã đó phải nhờ chủ repo thử trên iPhone.
 - **Không chép lời mô tả Pokédex của game** (flavor text): đó là văn bản có bản quyền. Trang chi tiết chỉ hiện số liệu: loài, chiều cao, cân nặng, năng lực, tỉ lệ bắt, nhóm trứng…
 - **Dữ liệu ngoài PokeAPI** (đội hình trùm, danh sách White Forest) lấy từ pokemondb.net và ghi trực tiếp trong `build.py`. Bulbapedia không truy cập được từ phiên đám mây.
 - **Một file, không framework, không phụ thuộc mạng lúc chạy.** Dữ liệu nằm sẵn trong `index.html`; font tự lưu trữ.

@@ -85,15 +85,82 @@ test('a sprite seen online is still shown when offline', async browser => {
   await ctx.close();
 });
 
-test('clear button empties the search and brings the full list back', async browser => {
+test('search bar sits at the bottom of the screen, just above the tabs', async browser => {
+  const { ctx, page } = await open(browser);
+  const q = await page.locator('#q').boundingBox(), tabs = await page.locator('.tabs').boundingBox();
+  assert.ok(q.y > 844 * 0.7, 'search bar should be in the bottom part of the screen, y=' + q.y);
+  assert.ok(q.y + q.height <= tabs.y, 'search bar should be above the tab row');
+  await ctx.close();
+});
+
+test('typing in the search bar lists matches above it, and tapping one opens that Pokémon', async browser => {
+  const { ctx, page } = await open(browser);
+  assert.ok(await page.locator('#results').isHidden(), 'no results while the box is empty');
+  await page.fill('#q', 'snivy');
+  assert.deepStrictEqual(await page.locator('#results [data-id]').evaluateAll(els => els.map(e => e.dataset.id)), ['495']);
+  const sheet = await page.locator('#results').boundingBox(), q = await page.locator('#q').boundingBox();
+  assert.ok(sheet.y + sheet.height <= q.y, 'results open above the search bar');
+  await page.click('#results [data-id="495"]');
+  await page.waitForFunction(() => location.hash === '#p495');
+  assert.ok(await page.locator('#results').isHidden(), 'results close after picking');
+  assert.strictEqual(await page.inputValue('#q'), '');
+  assert.ok(await page.locator('.tabs').isVisible(), 'tabs come back after picking');
+  await ctx.close();
+});
+
+test('search finds Pokémon outside the Unova list, by type and by evolution level', async browser => {
+  const { ctx, page } = await open(browser);
+  const ids = async q => { await page.fill('#q', q); return page.locator('#results [data-id]').evaluateAll(els => els.map(e => +e.dataset.id)); };
+  assert.ok((await ids('pikachu')).includes(25), 'Pikachu is not in the Unova list but should be found');
+  assert.ok((await ids('lv 17')).includes(495) && !(await ids('lv 17')).includes(496), 'Snivy evolves at 17, Servine does not');
+  assert.ok((await ids('dragon')).includes(610), 'Axew is a Dragon type');
+  await ctx.close();
+});
+
+test('clear button empties the search and closes the results', async browser => {
   const { ctx, page } = await open(browser);
   assert.ok(await page.locator('#q-clear').isHidden(), 'no clear button while the box is empty');
   await page.fill('#q', 'snivy');
-  assert.strictEqual(await page.locator('#list .row').count(), 1);
   await page.click('#q-clear');
   assert.strictEqual(await page.inputValue('#q'), '');
-  assert.strictEqual(await page.locator('#list .row').count(), 156);
+  assert.ok(await page.locator('#results').isHidden());
   assert.ok(await page.locator('#q-clear').isHidden());
+  assert.strictEqual(await page.locator('#list .row').count(), 156, 'the Dex list itself is untouched by searching');
+  await ctx.close();
+});
+
+test('the selected tab is Bright Blue', async browser => {
+  const { ctx, page } = await open(browser);
+  const bg = id => page.locator(id).evaluate(e => getComputedStyle(e).backgroundColor);
+  assert.strictEqual(await bg('#tab-dex'), 'rgb(0, 150, 255)');
+  await page.click('#tab-types');
+  assert.strictEqual(await bg('#tab-types'), 'rgb(0, 150, 255)');
+  assert.notStrictEqual(await bg('#tab-dex'), 'rgb(0, 150, 255)');
+  await ctx.close();
+});
+
+test('evolution is shown as cards with the condition on each evolved form', async browser => {
+  const { ctx, page } = await open(browser);
+  await page.click('#list .row[data-id="495"]');
+  await page.waitForSelector('#s-evo .pcard');
+  assert.deepStrictEqual(await page.locator('#s-evo .pcard .nm').allTextContents(), ['Snivy', 'Servine', 'Serperior']);
+  assert.deepStrictEqual(await page.locator('#s-evo .cond').allTextContents(), ['', 'Lv 17', 'Lv 36']);
+  assert.ok(await page.locator('#s-evo .pcard.me .nm').textContent() === 'Snivy', 'the Pokémon being viewed is marked');
+  await page.click('#s-evo .pcard[data-id="496"]');
+  await page.waitForFunction(() => location.hash === '#p496');
+  await page.evaluate(() => { location.hash = 'p133'; });
+  await page.waitForFunction(() => document.querySelectorAll('#s-evo .pcard').length === 8);   // Eevee and its seven Gen V evolutions
+  assert.strictEqual(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0);
+  await ctx.close();
+});
+
+test('round buttons beside the picture step to the previous and next Pokémon', async browser => {
+  const { ctx, page } = await open(browser);
+  await page.click('#list .row[data-id="495"]');
+  await page.click('#view-detail .hero [aria-label^="Next"]');
+  await page.waitForFunction(() => location.hash === '#p496');
+  await page.click('#view-detail .hero [aria-label^="Previous"]');
+  await page.waitForFunction(() => location.hash === '#p495');
   await ctx.close();
 });
 
@@ -160,8 +227,7 @@ test('opening another page under the same address does not replace the offline c
   const { ctx, page } = await open(browser);
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => navigator.serviceWorker.controller);
-  await page.goto(URL + 'preview/');
-  await page.waitForSelector('#rows .row');
+  await page.goto(URL + 'widget/pokedex-widget.js');
   await page.waitForTimeout(500);            // let the service worker finish any cache write
   const saved = await page.evaluate(async () => (await (await caches.match(new URL('../', location.href).href)).text()));
   assert.ok(saved.includes('id="view-list"'), 'the saved start page should still be the app, not the page just visited');

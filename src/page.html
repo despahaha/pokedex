@@ -2,236 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
-/* Layout: one handheld column. Red device bar on top, five thumb tabs fixed at the bottom,
-   content as "windows" with an ink title bar, hard pixel borders and offset shadows. */
-:root {
-  --bg: #dfe5ea;
-  --panel: #f8fafb;
-  --panel-2: #cfd8df;
-  --ink: #1a2030;
-  --mute: #566176;
-  --red: #d63a2c;
-  --red-ink: #fff6ee;
-  --hi: #ffd84a;
-  --good: #2f9e52;
-  --bad: #cf4a3c;
-  --zero: #3a4152;
-  --on-mark: #ffffff;
-  --title: #1a2030;
-  --title-ink: #f8fafb;
-  --px: "Press Start 2P", "Courier New", monospace;
-  --tx: "VT323", "Menlo", "Courier New", monospace;
-  --bar-h: 46px;
-  --safe-t: env(safe-area-inset-top, 0px);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #12161f; --panel: #1e2431; --panel-2: #2b3345; --ink: #e8edf6; --mute: #9aa6bb;
-    --red: #c93426; --red-ink: #fff6ee; --hi: #e9bf2c; --good: #3fb968; --bad: #e2604f; --zero: #6b7489; --on-mark: #10141c;
-    --title: #3a4560; --title-ink: #f1f4fa;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #12161f; --panel: #1e2431; --panel-2: #2b3345; --ink: #e8edf6; --mute: #9aa6bb;
-  --red: #c93426; --red-ink: #fff6ee; --hi: #e9bf2c; --good: #3fb968; --bad: #e2604f; --zero: #6b7489; --on-mark: #10141c;
-  --title: #3a4560; --title-ink: #f1f4fa;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
-body {
-  background: var(--bg); color: var(--ink);
-  font-family: var(--tx); font-size: 20px; line-height: 1.15;
-  -webkit-font-smoothing: none; -webkit-text-size-adjust: 100%;
-}
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: var(--safe-t); z-index: 10; background: var(--red); }
-button, input, textarea { font: inherit; color: inherit; border-radius: 0; }
-button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 3px solid var(--hi); outline-offset: 2px; }
-.wrap { max-width: 560px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-
-/* device bar */
-.top { position: sticky; top: var(--safe-t); z-index: 9; background: var(--red); color: var(--red-ink); border-bottom: 4px solid #1a2030; height: var(--bar-h); }
-.top .wrap { height: 100%; display: flex; align-items: center; gap: 10px; }
-.lens { width: 22px; height: 22px; background: #6fd0ff; border: 3px solid var(--red-ink); box-shadow: inset -4px -4px 0 #2b86c9; flex: none; }
-.top h1 { font-family: var(--px); font-size: 14px; margin: 0; letter-spacing: 1px; }
-.dots { display: flex; gap: 5px; margin-left: 4px; }
-.dots i { width: 8px; height: 8px; border: 2px solid #1a2030; }
-.topbtn { margin-left: auto; background: rgba(0,0,0,.25); color: var(--red-ink); border: 3px solid #1a2030; padding: 2px 10px; font-size: 20px; min-height: 34px; }
-.topbtn[aria-pressed="true"] { background: var(--red-ink); color: #1a2030; }
-
-/* bottom tabs */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9; background: var(--panel); border-top: 4px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.tabs .wrap { display: flex; gap: 5px; padding-block: 6px; }
-.tabs button { flex: 1 1 0; min-width: 0; min-height: 46px; background: var(--panel-2); border: 3px solid var(--ink); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 20px; padding: 2px 0; }
-.tabs button[aria-selected="true"] { background: var(--red); color: var(--red-ink); box-shadow: inset 0 -5px 0 rgba(0,0,0,.25); }
-.tabs .n { font-family: var(--px); font-size: 7px; background: var(--hi); color: #14181f; border: 2px solid #1a2030; padding: 3px 3px 2px; }
-
-main { padding-block: 12px calc(96px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; }
-.box { background: var(--panel); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); padding: 10px; scroll-margin-top: calc(var(--safe-t) + var(--bar-h) + 62px); }
-.box > h2 { background: var(--title); color: var(--title-ink); margin: -10px -10px 10px; padding: 5px 10px 6px; font-family: var(--tx); font-weight: normal; font-size: 23px; line-height: 1.05; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
-.box > h2 .ico { font-family: var(--px); font-size: 10px; color: var(--hi); }
-.box > h2 .end { margin-left: auto; display: flex; gap: 4px; }
-.note { color: var(--mute); font-size: 18px; margin: 0 0 10px; }
-.note:last-child { margin-bottom: 0; }
-.group { font-family: var(--px); font-size: 10px; margin: 6px 0 -4px; color: var(--mute); text-transform: uppercase; }
-
-/* list tools */
-.tools { position: sticky; top: calc(var(--safe-t) + var(--bar-h)); z-index: 5; background: var(--bg); margin: -12px 0 -4px; padding: 12px 0 8px; display: flex; flex-direction: column; gap: 8px; }
-.search { width: 100%; min-width: 0; background: var(--panel); border: 3px solid var(--ink); padding: 8px 10px; font-size: 22px; box-shadow: 4px 4px 0 var(--ink); -webkit-appearance: none; appearance: none; }
-.search::placeholder { color: var(--mute); }
-.search::-webkit-search-cancel-button { display: none; }
-.searchwrap { position: relative; }
-.searchwrap .search { padding-right: 46px; }
-#q-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: none; border: 0; font-size: 24px; color: var(--mute); }
-.seg { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.chip { background: var(--panel); border: 3px solid var(--ink); padding: 4px 8px; font-size: 20px; min-height: 36px; white-space: nowrap; }
-.chip[aria-pressed="true"], .chip[aria-expanded="true"] { background: var(--ink); color: var(--panel); }
-.chip.push { margin-left: auto; }
-.typebar { display: flex; flex-wrap: wrap; gap: 7px; background: var(--panel); border: 3px solid var(--ink); padding: 10px; }
-.count { color: var(--mute); font-size: 18px; }
-
-.ty { display: inline-block; font-family: var(--px); font-size: 8px; line-height: 1; text-transform: uppercase; padding: 4px 5px 3px; border: 2px solid #1a2030; color: #14181f; white-space: nowrap; }
-.ty.w { color: #fff; }
-button.ty { padding: 9px 7px 8px; }
-button.ty[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--hi), 0 0 0 5px var(--ink); }
-
-.list { display: flex; flex-direction: column; gap: 8px; list-style: none; margin: 0; padding: 0; }
-.row { width: 100%; text-align: left; display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; background: var(--panel); border: 3px solid var(--ink); padding: 6px 8px 6px 6px; box-shadow: 3px 3px 0 var(--ink); }
-.row:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-.tile { width: 70px; height: 70px; border: 3px solid #1a2030; grid-row: span 2; image-rendering: pixelated; image-rendering: crisp-edges; max-width: none; display: block; }
-.row .nm { font-size: 24px; line-height: 1; overflow-wrap: anywhere; }
-.row .no { font-family: var(--px); font-size: 8px; color: var(--mute); margin-right: 6px; }
-.row .tys { display: flex; gap: 4px; flex-wrap: wrap; }
-.row .ev { grid-row: 1 / span 2; grid-column: 3; text-align: right; font-size: 20px; max-width: 118px; }
-.row .ev b { font-weight: normal; background: var(--hi); color: #14181f; padding: 1px 5px; border: 2px solid #1a2030; display: inline-block; }
-.row .ev i { font-style: normal; color: var(--mute); }
-.star { color: var(--bad); }
-.got { color: var(--good); }
-.empty { text-align: center; color: var(--mute); padding: 20px 0; }
-.prow { grid-template-columns: minmax(0, 1fr) auto; padding: 9px 10px; font-size: 23px; }
-.prow span:last-child { color: var(--mute); font-size: 19px; }
-
-/* detail */
-.dnav { display: flex; gap: 8px; align-items: stretch; }
-.btn { background: var(--panel); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 5px 10px; font-size: 20px; min-height: 40px; text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-.btn[disabled] { opacity: .4; }
-.btn[aria-pressed="true"] { background: var(--hi); color: #14181f; }
-.dnav .grow { margin-right: auto; }
-.flat { box-shadow: none; background: var(--panel-2); }
-.wide { width: 100%; margin-top: 10px; }
-.hero { display: grid; grid-template-columns: 102px minmax(0, 1fr); gap: 12px; align-items: center; }
-.hero .tile { width: 102px; height: 102px; grid-row: auto; }
-.tile[data-fb] { padding: 2px; }
-.hero .tile[data-fb] { padding: 8px; }
-.hero .no { font-family: var(--px); font-size: 8px; color: var(--mute); line-height: 1.7; }
-.hero h2 { font-family: var(--tx); font-size: 38px; font-weight: normal; margin: 0; line-height: .95; overflow-wrap: anywhere; }
-.hero .ge { color: var(--mute); font-size: 19px; margin-bottom: 5px; }
-.hero .tys { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.acts { grid-column: 1 / -1; display: flex; gap: 8px; }
-.acts .btn { flex: 1 1 0; min-width: 0; padding-inline: 4px; }
-
-.jump { position: sticky; top: calc(var(--safe-t) + var(--bar-h)); z-index: 5; background: var(--bg); margin: -6px 0; padding: 6px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-.jump::-webkit-scrollbar { display: none; }
-.jump .chip { flex: 1 0 auto; text-align: center; padding-inline: 6px; }
-
-.next { background: var(--hi); color: #14181f; border: 3px solid #1a2030; padding: 8px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-.next .lv { font-size: 26px; line-height: 1; text-transform: uppercase; }
-.next.done { background: var(--panel-2); color: var(--ink); border-color: var(--ink); }
-.edges { display: flex; flex-direction: column; gap: 8px; }
-.edge { border-top: 2px dashed var(--mute); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
-.edge:first-child { border-top: 0; padding-top: 0; }
-.edge .pair { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.mon { background: var(--panel-2); border: 2px solid var(--ink); padding: 2px 8px 2px 2px; font-size: 21px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; text-align: left; }
-.mon img { width: 32px; height: 32px; flex: none; image-rendering: pixelated; image-rendering: crisp-edges; background: #e9eef2; }
-.mon.me { background: var(--ink); color: var(--panel); }
-.edge .how { color: var(--mute); font-size: 19px; }
-
-.locs { display: flex; flex-direction: column; }
-.loc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 0; border-top: 2px dashed var(--mute); align-items: center; }
-.loc:first-child { border-top: 0; padding-top: 0; }
-.loc .pl { font-size: 22px; grid-column: 1 / -1; background: none; border: 0; padding: 0; text-align: left; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
-.loc .pl.plain { text-decoration: none; }
-.loc .how { color: var(--mute); font-size: 19px; }
-.loc .rt { text-align: right; font-size: 19px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.loc .rt b { font-weight: normal; background: var(--panel-2); border: 2px solid var(--ink); padding: 0 5px; }
-.warn { background: var(--panel-2); border: 3px solid var(--ink); padding: 8px; margin: 0 0 10px; }
-.warn:last-child { margin-bottom: 0; }
-
-.mv { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; gap: 1px 8px; padding: 6px 0; border-top: 2px dashed var(--mute); align-items: center; }
-.mv:first-child { border-top: 0; padding-top: 0; }
-.mv .lv { font-family: var(--px); font-size: 8px; color: var(--mute); }
-.mv .mn { font-size: 22px; overflow-wrap: anywhere; }
-.mv .ms { grid-column: 2 / -1; color: var(--mute); font-size: 18px; }
-.mv .ms b { font-weight: normal; color: var(--good); }
-
-.eff { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 8px 10px; align-items: start; }
-.mult { font-family: var(--px); font-size: 10px; text-align: center; padding: 6px 0 5px; border: 2px solid #1a2030; color: var(--on-mark); }
-.mult.g { background: var(--good); } .mult.b { background: var(--bad); } .mult.z { background: var(--zero); }
-.eff .tys { display: flex; flex-wrap: wrap; gap: 5px; padding-top: 2px; }
-.eff .lbl { grid-column: 1 / -1; color: var(--mute); font-size: 18px; }
-.eff .none { color: var(--mute); font-size: 18px; }
-.sub { margin: 12px 0 8px; display: flex; align-items: center; gap: 8px; font-size: 20px; }
-.sub:first-of-type { margin-top: 0; }
-
-.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; }
-.facts dt { color: var(--mute); }
-.facts dd { margin: 0; }
-.facts small { color: var(--mute); font-size: 18px; }
-.stats { display: grid; grid-template-columns: auto 34px minmax(0, 1fr); gap: 5px 8px; align-items: center; font-variant-numeric: tabular-nums; }
-.stats .bar { height: 12px; background: var(--panel-2); border: 2px solid var(--ink); }
-.stats .bar i { display: block; height: 100%; background: var(--good); }
-.stats .v { text-align: right; }
-
-/* team, bosses */
-.cover { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 7px 10px; align-items: center; }
-.cover .who { font-size: 19px; }
-.cover .who.no { color: var(--mute); }
-.squad { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-.squad .m { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
-.squad .m .r { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-.squad .m .l { font-family: var(--px); font-size: 8px; }
-.tips { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-.tips .t { display: inline-flex; align-items: center; gap: 4px; font-size: 19px; }
-
-/* options */
-.sizes { display: flex; gap: 6px; }
-.sizes .btn { flex: 1 1 0; min-width: 0; padding-inline: 2px; }
-.code { width: 100%; min-height: 78px; background: var(--panel-2); border: 3px solid var(--ink); padding: 6px; font-size: 18px; resize: vertical; overflow-wrap: anywhere; }
-.meter { height: 16px; background: var(--panel-2); border: 2px solid var(--ink); margin: 4px 0 10px; }
-.meter i { display: block; height: 100%; background: var(--good); }
-.status { min-height: 22px; margin: 8px 0 0; }
-.steps { margin: 0 0 4px; padding-left: 26px; display: flex; flex-direction: column; gap: 6px; }
-.steps b { font-weight: normal; background: var(--panel-2); padding: 0 4px; }
-
-.picker { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
-.scroll { overflow-x: auto; }
-table.mx { border-collapse: collapse; font-family: var(--px); font-size: 7px; }
-.mx th, .mx td { border: 1px solid var(--mute); width: 17px; min-width: 17px; height: 19px; text-align: center; padding: 0; }
-.mx th { color: #14181f; }
-.mx th.w { color: #fff; }
-.mx th.corner { background: var(--panel-2); color: var(--ink); font-size: 5px; min-width: 30px; }
-.mx thead th { height: 34px; }
-.mx thead th span { display: inline-block; writing-mode: vertical-rl; }
-.mx tbody th { min-width: 30px; position: sticky; left: 0; }
-.mx td.g { background: var(--good); color: var(--on-mark); } .mx td.b { background: var(--bad); color: var(--on-mark); } .mx td.z { background: var(--zero); color: var(--on-mark); }
-/* dock: a sideways, glanceable view of the team for when the phone is charging on its side */
-body.dock .top, body.dock .tabs { display: none; }
-body.dock .wrap { max-width: none; }
-body.dock main { padding-block: 10px; gap: 10px; }
-.dhead { display: flex; align-items: center; gap: 10px; }
-.dhead h2 { font-family: var(--px); font-size: 12px; margin: 0; }
-.dhead .clock { margin-left: auto; font-family: var(--px); font-size: 12px; color: var(--mute); }
-.dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
-.dcard { background: var(--panel); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 6px 8px; text-align: left; display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 4px 10px; align-items: center; }
-.dcard .nm { font-size: 26px; line-height: 1; overflow-wrap: anywhere; }
-.dcard .tys { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.dcard .ln { grid-column: 1 / -1; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 6px; align-items: start; }
-.dcard .ln .tys { margin: 0; }
-.dcard .mult { font-size: 7px; padding: 5px 0 4px; }
-.dcard .nx { color: var(--mute); font-size: 18px; }
-@media (prefers-reduced-motion: reduce) { .row:active, .btn:active { transform: none; } }
+/*STYLE*/
 </style>
 
 <header class="top">
@@ -245,10 +16,6 @@ body.dock main { padding-block: 10px; gap: 10px; }
 <div class="wrap">
   <main id="view-list">
     <div class="tools">
-      <div class="searchwrap">
-        <input class="search" id="q" type="search" placeholder="Name, number, type, “lv 17”…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search Pokémon by name, number, type, ability or evolution level">
-        <button id="q-clear" aria-label="Clear search" hidden>✕</button>
-      </div>
       <div class="seg">
         <button class="chip" id="dex-unova" aria-pressed="true">Unova</button>
         <button class="chip" id="dex-nat" aria-pressed="false">All 649</button>
@@ -288,15 +55,23 @@ body.dock main { padding-block: 10px; gap: 10px; }
   </main>
 </div>
 
-<nav class="tabs" aria-label="Sections">
-  <div class="wrap" role="tablist">
-    <button id="tab-dex" role="tab" aria-selected="true">Dex</button>
-    <button id="tab-types" role="tab" aria-selected="false">Types</button>
-    <button id="tab-places" role="tab" aria-selected="false">Places</button>
-    <button id="tab-bosses" role="tab" aria-selected="false">Bosses</button>
-    <button id="tab-team" role="tab" aria-selected="false">Team<span class="n" id="team-n">0</span></button>
+<div class="bottom" id="bottom">
+  <div class="wrap">
+    <div class="results" id="results" hidden></div>
+    <div class="searchbar">
+      <span class="mag" aria-hidden="true"></span>
+      <input id="q" type="search" placeholder="Search name, number, type, “lv 17”" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search Pokémon by name, number, type, ability or evolution level">
+      <button id="q-clear" aria-label="Clear search" hidden>✕</button>
+    </div>
+    <nav class="tabs" aria-label="Sections" role="tablist">
+      <button id="tab-dex" role="tab" aria-selected="true">Dex</button>
+      <button id="tab-types" role="tab" aria-selected="false">Types</button>
+      <button id="tab-places" role="tab" aria-selected="false">Places</button>
+      <button id="tab-bosses" role="tab" aria-selected="false">Bosses</button>
+      <button id="tab-team" role="tab" aria-selected="false">Team<span class="n" id="team-n">0</span></button>
+    </nav>
   </div>
-</nav>
+</div>
 
 <script>
 const DATA = /*DATA*/;
@@ -322,6 +97,7 @@ let party = load('party'), caught = load('caught');
 const saveParty = () => { store('party', party); $('team-n').textContent = party.size; };
 const saveCaught = () => store('caught', caught);
 
+const qEl = $('q'), resultsEl = $('results'), bottomEl = $('bottom');
 const state = { dex: 'unova', q: '', type: -1, onlyNew: false, atk: 9, def: [11], allLocs: false, allTms: false };
 
 /*SPRITES*/
@@ -331,7 +107,7 @@ const SPRITE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/spr
 const pic = (m, attrs = '') => SPRITE_URL
   ? `<img ${attrs} src="${SPRITE_URL}${m.i}.png" data-mon="${m.i}" crossorigin="anonymous" loading="lazy" alt="">`
   : `<img ${attrs} src="${sprite(m)}" data-fb="1" alt="">`;
-const tile = m => pic(m, `class="tile" style="background:${mix(COL[m.t[0]], 255, .68)}"`);
+const tile = m => `<span class="disc" style="--tint:${mix(COL[m.t[0]], 255, .6)}">${pic(m, 'class="tile"')}</span>`;
 /* a sprite that fails to load (offline and never seen, or the host is down) is replaced by the drawn mascot */
 document.addEventListener('error', e => {
   const img = e.target;
@@ -373,10 +149,8 @@ function matches(m, q) {
   });
 }
 function renderList() {
-  const q = state.q.trim().toLowerCase();
   const all = dexOrder();
-  const rows = all.filter(m =>
-    (state.type < 0 || m.t.includes(state.type)) && (!state.onlyNew || !caught.has(m.i)) && (!q || matches(m, q)));
+  const rows = all.filter(m => (state.type < 0 || m.t.includes(state.type)) && (!state.onlyNew || !caught.has(m.i)));
   $('count').textContent = `${rows.length} Pokémon · ${all.filter(m => caught.has(m.i)).length} of ${all.length} caught · yellow tag = next evolution`;
   $('list').innerHTML = rows.length ? rows.map(rowHTML).join('')
     : '<li class="empty">No Pokémon match. Try “All 649”, or clear the type and Uncaught filters.</li>';
@@ -470,33 +244,52 @@ function facts(m) {
   return `<dl class="facts">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
 }
 
+const sizeText = m => {
+  const inches = Math.round(m.ht * 3.937);
+  return { ft: `${Math.floor(inches / 12)}′${String(inches % 12).padStart(2, '0')}″`, m: (m.ht / 10).toFixed(1), lbs: (m.wt * 0.220462).toFixed(1), kg: (m.wt / 10).toFixed(1) };
+};
+/* The whole family as cards. A straight line of up to three sits in one row; anything that branches stacks by stage. */
+function evoBlock(m) {
+  const fam = M.filter(x => x.c === m.c);
+  if (fam.length < 2) return '<p class="note">This Pokémon does not evolve.</p>';
+  const depth = x => x.f && byId.has(x.f) ? depth(byId.get(x.f)) + 1 : 0;
+  const stages = [];
+  fam.forEach(x => { const d = depth(x); (stages[d] = stages[d] || []).push(x); });
+  const card = x => `<div class="step"><b class="cond">${x.f ? esc(x.m.map(c => c[0]).join(' / ')) : ''}</b>
+    <button class="pcard${x.i === m.i ? ' me' : ''}" data-id="${x.i}" style="--frame:${COL[x.t[0]]}"><span class="bar"><span>No.${String(x.i).padStart(4, '0')}</span><i></i></span><span class="nm">${esc(x.n)}</span>${tile(x)}</button></div>`;
+  const linear = stages.length <= 3 && stages.every(st => st.length === 1);
+  const cards = linear
+    ? `<div class="evo${stages.length === 2 ? ' big' : ''}">${stages.map(st => card(st[0])).join('<span class="arrow">▶</span>')}</div>`
+    : `<div class="evo tall">${stages.map(st => `<div class="stagerow">${st.map(card).join('')}</div>`).join('<span class="arrow">▼</span>')}</div>`;
+  const lines = fam.filter(x => x.f).sort((a, b) => depth(a) - depth(b) || a.i - b.i)
+    .map(x => `<li><b>${esc(byId.get(x.f).n)} → ${esc(x.n)}:</b> ${x.m.map(c => esc(c[1])).join(' — or — ')}</li>`);
+  return cards + `<ul class="evolist">${lines.join('')}</ul>`;
+}
+
 let lastList = '';
 function renderDetail(m) {
-  const fam = M.filter(x => x.c === m.c);
-  const depth = x => x.f && byId.has(x.f) ? depth(byId.get(x.f)) + 1 : 0;
-  const edges = fam.filter(x => x.f).sort((a, b) => depth(a) - depth(b) || a.i - b.i);
-  const k = kids.get(m.i) || [];
-  const next = k.length
-    ? `<div class="next">${k.map(c => `<div><div class="lv">▲ ${esc(c.n)}</div><div>${c.m.map(x => esc(x[1])).join(' — or — ')}</div></div>`).join('')}</div>`
-    : `<div class="next done">${m.f ? 'Final form. It does not evolve further.' : 'This Pokémon does not evolve.'}</div>`;
-  const total = m.s.reduce((a, b) => a + b, 0);
+  const total = m.s.reduce((a, b) => a + b, 0), size = sizeText(m);
   let order = dexOrder(), at = order.indexOf(m);
   if (at < 0) { order = M; at = order.indexOf(m); }
   const prev = order[at - 1], nxt = order[at + 1];
   $('view-detail').innerHTML = `
-    <div class="dnav">
-      <button class="btn grow" id="back">◀ Back</button>
-      <button class="btn" ${prev ? `data-id="${prev.i}"` : 'disabled'} aria-label="Previous Pokémon${prev ? ': ' + esc(prev.n) : ''}">▲ Prev</button>
-      <button class="btn" ${nxt ? `data-id="${nxt.i}"` : 'disabled'} aria-label="Next Pokémon${nxt ? ': ' + esc(nxt.n) : ''}">Next ▼</button>
-    </div>
-    <section class="box hero">
-      ${tile(m)}
-      <div>
-        <div class="no">NATIONAL #${pad(m.i)}${m.u !== undefined ? ' · UNOVA #' + pad(m.u) : ''}</div>
-        <h2>${esc(m.n)}</h2>
-        <div class="ge">${esc(m.ge)}</div>
-        <div class="tys">${m.t.map(t => badge(t)).join('')}</div>
+    <div class="dnav"><button class="btn grow" id="back">◀ Back</button></div>
+    <section class="box hero" style="--frame:${COL[m.t[0]]}">
+      <div class="no">No.${String(m.i).padStart(4, '0')}${m.u !== undefined ? ' · UNOVA ' + pad(m.u) : ''}</div>
+      <h2>${esc(m.n)}</h2>
+      <div class="ge">${esc(m.ge)}</div>
+      <div class="stage">
+        <button class="round" ${prev ? `data-id="${prev.i}"` : 'disabled'} aria-label="Previous Pokémon${prev ? ': ' + esc(prev.n) : ''}">‹</button>
+        ${tile(m)}
+        <button class="round" ${nxt ? `data-id="${nxt.i}"` : 'disabled'} aria-label="Next Pokémon${nxt ? ': ' + esc(nxt.n) : ''}">›</button>
       </div>
+      <div class="tys">${m.t.map(t => badge(t)).join('')}</div>
+      <div class="cells">
+        <div class="cell"><small>Height</small><b>${size.ft}</b><i>${size.m} m</i></div>
+        <div class="cell"><small>Weight</small><b>${size.lbs} lbs</b><i>${size.kg} kg</i></div>
+        <div class="cell"><small>Gender</small>${m.gr < 0 ? '<b>—</b><i>Genderless</i>' : `<b>♂ ${100 - m.gr * 12.5}%</b><i>♀ ${m.gr * 12.5}%</i>`}</div>
+      </div>
+      <div class="fact"><small>Abilities</small>${m.a.map(([a, h]) => h ? `<span>${esc(DATA.abil[a])} (hidden)</span>` : `<b>${esc(DATA.abil[a])}</b>`).join(' · ') || '—'}</div>
       <div class="acts">
         <button class="btn flat" id="party-btn" aria-pressed="${party.has(m.i)}">${party.has(m.i) ? '★ In team' : '☆ Team'}</button>
         <button class="btn flat" id="caught-btn" aria-pressed="${caught.has(m.i)}">${caught.has(m.i) ? '✔ Caught' : '○ Caught'}</button>
@@ -522,10 +315,7 @@ function renderDetail(m) {
     </section>
     <section class="box" id="s-evo">
       <h2><span class="ico">▶</span>Evolution</h2>
-      ${next}
-      ${edges.length ? `<div class="edges">${edges.map(e => `<div class="edge">
-        <div class="pair">${monBtn(byId.get(e.f), m.i)}<span>→</span>${monBtn(e, m.i)}</div>
-        <div class="how">${e.m.map(x => esc(x[1])).join('<br>or ')}</div></div>`).join('')}</div>` : ''}
+      ${evoBlock(m)}
     </section>
     <section class="box" id="s-loc">
       <h2><span class="ico">▶</span>Where to catch in White</h2>
@@ -728,13 +518,19 @@ function route() {
   if (view === 'detail') { state.allLocs = state.allTms = false; renderDetail(byId.get(+pm[1])); }
   else if (view === 'place') renderPlace(+lm[1]);
   else ({ list: renderList, types: renderTypes, places: renderPlaces, bosses: renderBosses, team: renderTeam, more: renderMore, dock: renderDock })[view]();
-  window.scrollTo(0, cameBack && view !== 'detail' ? scrolls[h] || 0 : 0);
+  if (!resultsEl.hidden) { qEl.value = ''; renderResults(); }
+  const y = cameBack && view !== 'detail' ? scrolls[h] || 0 : 0;
+  window.scrollTo(0, y);
+  /* iOS can leave the sticky bars where they were if the page changed while it was mid-scroll; scrolling again settles them */
+  requestAnimationFrame(() => { if (location.hash.replace('#', '') === h) window.scrollTo(0, y); });
   currentHash = h; currentView = view;
 }
 const go = h => { if (location.hash.replace('#', '') === h) route(); else location.hash = h; };
 /* any element with data-id opens that Pokémon, data-loc that place */
 document.addEventListener('click', e => {
-  const a = e.target.closest('[data-id]'); if (a) return go('p' + a.dataset.id);
+  const a = e.target.closest('[data-id]');
+  if (a && a.closest('#results')) { const id = a.dataset.id; closeSearch(); return afterKeyboard(() => go('p' + id)); }
+  if (a) return go('p' + a.dataset.id);
   const l = e.target.closest('[data-loc]'); if (l) return go('l' + l.dataset.loc);
 });
 
@@ -751,9 +547,52 @@ function syncFilters() {
 const showTypes = on => { $('typebar').hidden = !on; $('type-toggle').setAttribute('aria-expanded', on); };
 try { if (localStorage.getItem('dex') === 'nat') state.dex = 'nat'; } catch (e) {}
 
-const setQuery = q => { state.q = q; $('q-clear').hidden = !q; renderList(); };
-$('q').addEventListener('input', e => setQuery(e.target.value));
-$('q-clear').onclick = () => { $('q').value = ''; setQuery(''); $('q').focus(); };
+/* ---- search: a bar at the bottom whose results open upward; while typing it rides on top of the keyboard ---- */
+const vv = window.visualViewport;
+/* the on-screen keyboard shrinks the visual viewport but not the layout the fixed bar is placed in */
+const keyboardHeight = () => vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+let keyboardWasOpen = false;
+function ride() {
+  const kb = keyboardHeight(), open = kb > 80;
+  bottomEl.style.transform = kb > 0 ? `translateY(${-kb / zoom}px)` : '';
+  bottomEl.classList.toggle('typing', open || document.activeElement === qEl);
+  /* once the keyboard is gone, a no-op scroll makes iOS put the sticky bars back where they belong */
+  if (keyboardWasOpen && !open) window.scrollTo(window.scrollX, window.scrollY);
+  keyboardWasOpen = open;
+}
+if (vv) { vv.addEventListener('resize', ride); vv.addEventListener('scroll', ride); }
+qEl.addEventListener('focus', ride);
+qEl.addEventListener('blur', () => setTimeout(ride, 60));
+function renderResults() {
+  const q = qEl.value.trim().toLowerCase();
+  $('q-clear').hidden = !qEl.value;
+  if (!q) { resultsEl.hidden = true; resultsEl.innerHTML = ''; return; }
+  const hits = M.filter(m => matches(m, q));
+  if (state.dex === 'unova') hits.sort((a, b) => (a.u === undefined) - (b.u === undefined) || (a.u ?? a.i) - (b.u ?? b.i));
+  const MAX = 40;
+  resultsEl.hidden = false;
+  resultsEl.innerHTML = hits.length
+    ? hits.slice(0, MAX).map(m => `<button data-id="${m.i}">${pic(m)}<span><span class="no">#${num(m)}</span><br><span class="nm">${esc(m.n)}${marks(m)}</span></span><span class="tys">${m.t.map(t => badge(t)).join('')}</span></button>`).join('')
+      + (hits.length > MAX ? `<div class="empty">${hits.length - MAX} more. Keep typing to narrow it down.</div>` : '')
+    : '<div class="empty">No Pokémon match. Try a name, a number, a type, or “lv 17”.</div>';
+  resultsEl.scrollTop = 0;
+}
+function closeSearch() { qEl.value = ''; renderResults(); qEl.blur(); ride(); }
+/* Changing page while the keyboard is still sliding away leaves iOS with its bars in the wrong place, so wait for it to finish. */
+function afterKeyboard(fn) {
+  if (!vv || keyboardHeight() < 80) return fn();
+  let done = false;
+  const run = () => { if (done) return; done = true; vv.removeEventListener('resize', check); fn(); };
+  const check = () => { if (keyboardHeight() < 80) run(); };
+  vv.addEventListener('resize', check);
+  setTimeout(run, 700);
+}
+qEl.addEventListener('input', renderResults);
+qEl.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSearch();
+  if (e.key === 'Enter') { const first = resultsEl.querySelector('[data-id]'); if (first) first.click(); }
+});
+$('q-clear').onclick = () => { qEl.value = ''; renderResults(); qEl.focus(); };
 $('dex-unova').onclick = () => { state.dex = 'unova'; syncFilters(); };
 $('dex-nat').onclick = () => { state.dex = 'nat'; syncFilters(); };
 $('only-new').onclick = () => { state.onlyNew = !state.onlyNew; syncFilters(); };

@@ -314,6 +314,7 @@ json.dump({'v': 1, 'types': TNAME, 'chart': chart, 'mons': wmons}, open(ROOT + '
 widget_js = open(ROOT + 'widget/pokedex-widget.js', encoding='utf-8').read()
 
 html = open(SRC + 'page.html', encoding='utf-8').read()
+html = html.replace('/*STYLE*/', open(SRC + 'style.css', encoding='utf-8').read())
 html = html.replace('/*SPRITES*/', open(SRC + 'sprites.js', encoding='utf-8').read()).replace('/*DATA*/', blob)
 html = html.replace('/*WIDGET*/', json.dumps(widget_js, ensure_ascii=False).replace('</', '<\\/'))
 # the claude.ai copy cannot load outside images, so it keeps the drawn mascots
