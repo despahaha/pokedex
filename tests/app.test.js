@@ -156,6 +156,18 @@ test('options page lets you copy the widget script and your team code', async br
   await ctx.close();
 });
 
+test('opening another page under the same address does not replace the offline copy of the app', async browser => {
+  const { ctx, page } = await open(browser);
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.waitForFunction(() => navigator.serviceWorker.controller);
+  await page.goto(URL + 'preview/');
+  await page.waitForSelector('#rows .row');
+  await page.waitForTimeout(500);            // let the service worker finish any cache write
+  const saved = await page.evaluate(async () => (await (await caches.match(new URL('../', location.href).href)).text()));
+  assert.ok(saved.includes('id="view-list"'), 'the saved start page should still be the app, not the page just visited');
+  await ctx.close();
+});
+
 test('every tab and the options page render at the largest text size without sideways scrolling', async browser => {
   const { ctx, page } = await open(browser);
   await page.click('#open-more');

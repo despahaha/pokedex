@@ -24,6 +24,9 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
   /* page itself: try the network first so updates arrive, fall back to the saved copy when offline */
   if (req.mode === 'navigate') {
+    /* only the app's own start page is saved; other pages here (the look preview, the old address) go straight to the network */
+    const start = new URL('./', self.location).pathname;
+    if (url.pathname !== start && url.pathname !== start + 'index.html') return;
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('./', copy)); return r; })
       .catch(() => caches.match('./')));
     return;
